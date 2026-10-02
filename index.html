@@ -269,6 +269,11 @@
   .meal-block:last-child{border-bottom:none;}
   .meal-block .m-title{font-family:'Barlow Condensed'; font-weight:700; font-size:14px; color:var(--signal); margin-bottom:4px;}
   .meal-block p{margin:0; font-size:13px; color:#DADEE3; line-height:1.5;}
+  .meal-day{padding:14px 16px; border-bottom:1px solid var(--hairline);}
+  .meal-day:last-child{border-bottom:none;}
+  .meal-day-label{font-family:'Barlow Condensed'; font-weight:800; font-size:15px; color:var(--signal); margin-bottom:8px;}
+  .meal-row{font-size:12.5px; color:#DADEE3; line-height:1.6; margin-bottom:2px;}
+  .meal-row b{color:var(--paper); font-weight:600;}
   .type-grid{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
   .type-pill{flex:1; min-width:80px; text-align:center; padding:14px 8px; border-radius:14px; background:var(--panel); border:1px solid var(--hairline); cursor:pointer;}
   .type-pill.active{background:var(--panel-2); border-color:var(--signal);}
@@ -341,8 +346,8 @@
 <script>
   // ====== CONFIGURAZIONE — sostituisci questi due valori con quelli del tuo progetto Supabase ======
   // Li trovi in Supabase: Project Settings -> API -> "Project URL" e "anon public" key
-  const SUPABASE_URL = "https://knkuqlhuxskeqptwsdsg.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtua3VxbGh1eHNrZXFwdHdzZHNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NjIzMTMsImV4cCI6MjEwNjUzODMxM30.-D00QUjeEQIdrZzE0ZphtPDTSBfISTGXS9UhUxjbNIs";
+  const SUPABASE_URL = "INCOLLA_QUI_IL_TUO_PROJECT_URL";
+  const SUPABASE_ANON_KEY = "INCOLLA_QUI_LA_TUA_ANON_KEY";
   const supabaseClient = (SUPABASE_URL.startsWith("http"))
     ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
@@ -677,9 +682,9 @@
 
             <div id="schedaResult" style="display:none; margin-top:16px;">
               <div class="result-box" id="schedaResultBox">
-                <div class="plan-day"><div class="d">LUN</div><div class="info"><b>Full body — forza</b><span>6 esercizi · squat, panca, rematore, plank</span></div></div>
-                <div class="plan-day"><div class="d">MER</div><div class="info"><b>Cardio + core</b><span>30 min a intervalli + addominali</span></div></div>
-                <div class="plan-day"><div class="d">VEN</div><div class="info"><b>Full body — tonificazione</b><span>7 esercizi, circuito a ripetizioni alte</span></div></div>
+                <div class="plan-day"><div class="d">LUN</div><div class="info"><b>Full body — forza</b><span>Squat 4x8 · Panca 4x8 · Rematore 3x10 · Plank 3x40s</span></div></div>
+                <div class="plan-day"><div class="d">MER</div><div class="info"><b>Cardio + core</b><span>30 min a intervalli (1' forte/1' recupero) · Crunch 3x20 · Russian twist 3x20</span></div></div>
+                <div class="plan-day"><div class="d">VEN</div><div class="info"><b>Full body — tonificazione</b><span>Affondi 3x12 · Spinte manubri 3x12 · Trazioni assistite 3x8 · Hip thrust 3x15</span></div></div>
               </div>
               <div class="ai-disclaimer">Scheda generata automaticamente a scopo dimostrativo. Prima di iniziare un nuovo programma di allenamento, fatti valutare da un personal trainer o da un medico dello sport.</div>
               <button class="propose-btn" style="margin-top:4px;" onclick="downloadPlan('scheda')">Scarica scheda (.txt)</button>
@@ -710,10 +715,20 @@
 
             <div id="dietResult" style="display:none; margin-top:16px;">
               <div class="result-box" id="dietResultBox">
-                <div class="meal-block"><div class="m-title">Colazione</div><p id="mealColazione">Yogurt greco, fiocchi d'avena, frutta fresca e un cucchiaio di frutta secca.</p></div>
-                <div class="meal-block"><div class="m-title">Pranzo</div><p id="mealPranzo">Cereali integrali, fonte proteica magra (pollo, legumi o pesce) e verdure di stagione.</p></div>
-                <div class="meal-block"><div class="m-title">Cena</div><p id="mealCena">Proteine magre, verdure cotte o crude, un filo d'olio extravergine a crudo.</p></div>
-                <div class="meal-block"><div class="m-title">Spuntini</div><p id="mealSpuntini">Frutta fresca, yogurt o una manciata di frutta secca tra i pasti principali.</p></div>
+                <div class="meal-day">
+                  <div class="meal-day-label">LUN</div>
+                  <div class="meal-row"><b>Colazione:</b> Yogurt greco, fiocchi d'avena, frutta fresca e un cucchiaio di frutta secca.</div>
+                  <div class="meal-row"><b>Pranzo:</b> Cereali integrali, fonte proteica magra e verdure di stagione.</div>
+                  <div class="meal-row"><b>Cena:</b> Proteine magre, verdure cotte o crude, un filo d'olio extravergine a crudo.</div>
+                  <div class="meal-row"><b>Spuntini:</b> Frutta fresca o una manciata di frutta secca.</div>
+                </div>
+                <div class="meal-day">
+                  <div class="meal-day-label">MAR</div>
+                  <div class="meal-row"><b>Colazione:</b> Porridge d'avena con frutti di bosco e semi misti.</div>
+                  <div class="meal-row"><b>Pranzo:</b> Insalata di legumi, cereali integrali e verdure di stagione.</div>
+                  <div class="meal-row"><b>Cena:</b> Pesce al forno con verdure grigliate e un filo d'olio.</div>
+                  <div class="meal-row"><b>Spuntini:</b> Yogurt naturale o un frutto di stagione.</div>
+                </div>
               </div>
               <div class="ai-disclaimer">Piano generato automaticamente a scopo dimostrativo e informativo: non sostituisce il parere di un medico o di un nutrizionista abilitato, soprattutto in presenza di patologie, allergie o intolleranze.</div>
               <button class="propose-btn" style="margin-top:4px;" onclick="downloadPlan('cibo')">Scarica piano (.txt)</button>
@@ -1235,6 +1250,68 @@
     }
   }
 
+  let lastDietPlan = null; // array di {day, colazione, pranzo, cena, spuntini} dopo una generazione riuscita
+
+  function renderDietDays(days){
+    const box = document.getElementById('dietResultBox');
+    box.innerHTML = '';
+    days.forEach(function(d){
+      const wrap = document.createElement('div');
+      wrap.className = 'meal-day';
+      const label = document.createElement('div');
+      label.className = 'meal-day-label';
+      label.textContent = d.day || '';
+      wrap.appendChild(label);
+      [['Colazione','colazione'],['Pranzo','pranzo'],['Cena','cena'],['Spuntini','spuntini']].forEach(function(pair){
+        const row = document.createElement('div');
+        row.className = 'meal-row';
+        const b = document.createElement('b');
+        b.textContent = pair[0] + ': ';
+        row.appendChild(b);
+        row.appendChild(document.createTextNode(d[pair[1]] || ''));
+        wrap.appendChild(row);
+      });
+      box.appendChild(wrap);
+    });
+  }
+
+  function buildFallbackDietPlan(allergies){
+    const noGlutine = allergies.includes('Glutine');
+    const noLattosio = allergies.includes('Lattosio');
+    const colazioni = [
+      noLattosio ? "Porridge d'avena con bevanda vegetale, frutta fresca e semi" : "Yogurt greco, fiocchi d'avena e frutta fresca",
+      "Pane integrale" + (noGlutine ? " senza glutine" : "") + " con marmellata e un frutto",
+      noLattosio ? "Smoothie di frutta con bevanda vegetale e avena" : "Yogurt bianco con frutta secca e miele",
+      "Uova strapazzate con verdure e una fetta di pane" + (noGlutine ? " senza glutine" : ""),
+      noLattosio ? "Porridge di riso con frutta fresca" : "Yogurt greco con cereali e frutti di bosco"
+    ];
+    const pranzi = [
+      (noGlutine ? "Riso" : "Pasta integrale") + " con verdure di stagione e legumi",
+      "Petto di pollo alla griglia con" + (noGlutine ? " riso" : " cereali integrali") + " e insalata",
+      "Insalata di legumi, verdure crude e" + (noGlutine ? " riso" : " orzo"),
+      "Pesce al forno con patate e verdure grigliate",
+      (noGlutine ? "Quinoa" : "Farro") + " con verdure saltate e fonte proteica magra"
+    ];
+    const cene = [
+      "Proteine magre, verdure cotte o crude e un filo d'olio extravergine",
+      "Minestrone di verdure con" + (noGlutine ? " riso" : " orzo") + " e una fonte proteica leggera",
+      "Pesce alla griglia con verdure di stagione",
+      "Frittata di verdure con insalata mista",
+      "Zuppa di legumi e verdure" + (noGlutine ? " senza crostini" : " con crostini integrali")
+    ];
+    const spuntini = [
+      "Frutta fresca o una manciata di frutta secca",
+      noLattosio ? "Frutta fresca o gallette di riso" : "Yogurt naturale o un frutto di stagione",
+      "Frutta secca o un frutto fresco",
+      noLattosio ? "Un frutto o gallette di mais" : "Yogurt greco o un frutto",
+      "Frutta fresca di stagione"
+    ];
+    const labels = ['LUN','MAR','MER','GIO','VEN'];
+    return labels.map(function(day, i){
+      return { day: day, colazione: colazioni[i], pranzo: pranzi[i], cena: cene[i], spuntini: spuntini[i] };
+    });
+  }
+
   async function generateDiet(){
     if(!aiAnalysisAnswer){
       toast('Rispondi prima alla domanda sulle analisi del sangue');
@@ -1250,18 +1327,15 @@
       });
       if(!res.ok) throw new Error("request_failed");
       const data = await res.json();
-      if(data.colazione) document.getElementById('mealColazione').textContent = String(data.colazione);
-      if(data.pranzo) document.getElementById('mealPranzo').textContent = String(data.pranzo);
-      if(data.cena) document.getElementById('mealCena').textContent = String(data.cena);
-      if(data.spuntini) document.getElementById('mealSpuntini').textContent = String(data.spuntini);
+      if(data && Array.isArray(data.days) && data.days.length){
+        lastDietPlan = data.days;
+        renderDietDays(data.days);
+      } else {
+        throw new Error("formato_inatteso");
+      }
     } catch(e){
-      if(allergies.includes('Glutine')){
-        document.getElementById('mealColazione').textContent = 'Yogurt greco, fiocchi di riso o mais (senza glutine), frutta fresca e un cucchiaio di frutta secca.';
-        document.getElementById('mealPranzo').textContent = 'Riso o quinoa, fonte proteica magra (pollo, legumi o pesce) e verdure di stagione, senza glutine.';
-      }
-      if(allergies.includes('Lattosio')){
-        document.getElementById('mealCena').textContent = "Proteine magre, verdure cotte o crude, un filo d'olio extravergine a crudo — nessun derivato del latte.";
-      }
+      lastDietPlan = buildFallbackDietPlan(allergies);
+      renderDietDays(lastDietPlan);
     }
     document.getElementById('dietResult').style.display = 'block';
   }
@@ -1280,12 +1354,16 @@
       lines.push('', 'Generato automaticamente a scopo dimostrativo. Non sostituisce il parere di un personal trainer o medico dello sport.');
     } else {
       filename = 'piano-alimentare-sweat.txt';
-      lines = ['PIANO ALIMENTARE — Sweat', ''];
-      lines.push('Colazione: ' + document.getElementById('mealColazione').textContent);
-      lines.push('Pranzo: ' + document.getElementById('mealPranzo').textContent);
-      lines.push('Cena: ' + document.getElementById('mealCena').textContent);
-      lines.push('Spuntini: ' + document.getElementById('mealSpuntini').textContent);
-      lines.push('', 'Generato automaticamente a scopo dimostrativo e informativo. Non sostituisce il parere di un medico o di un nutrizionista abilitato.');
+      lines = ['PIANO ALIMENTARE SETTIMANALE — Sweat', ''];
+      (lastDietPlan || []).forEach(function(d){
+        lines.push('--- ' + d.day + ' ---');
+        lines.push('Colazione: ' + d.colazione);
+        lines.push('Pranzo: ' + d.pranzo);
+        lines.push('Cena: ' + d.cena);
+        lines.push('Spuntini: ' + d.spuntini);
+        lines.push('');
+      });
+      lines.push('Generato automaticamente a scopo dimostrativo e informativo. Non sostituisce il parere di un medico o di un nutrizionista abilitato.');
     }
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
