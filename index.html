@@ -433,26 +433,11 @@
         <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
       </div>
       <div class="search-wrap" style="padding-top:10px;">
-        <h2 style="font-family:'Barlow Condensed'; font-size:26px; margin:0 0 6px;">Raccontaci di te</h2>
-        <p style="font-size:13.5px; color:var(--fog); margin:0 0 18px;">Ci mette un attimo, e ci aiuta a mostrarti le persone e i contenuti giusti.</p>
+        <h2 style="font-family:'Barlow Condensed'; font-size:26px; margin:0 0 6px;">Dove ti alleni?</h2>
+        <p style="font-size:13.5px; color:var(--fog); margin:0 0 18px;">Ci serve per mostrarti gruppi ed eventi vicino a te. L'obiettivo e il livello te li chiediamo quando crei la tua scheda con il Coach AI.</p>
         <div class="filter-card">
-          <div class="field-row"><span class="field-label">Il tuo obiettivo principale</span>
-            <div class="chips" id="onboardGoal">
-              <div class="chip active" onclick="chipSelect(this)">Dimagrimento</div>
-              <div class="chip" onclick="chipSelect(this)">Massa muscolare</div>
-              <div class="chip" onclick="chipSelect(this)">Tonificazione</div>
-              <div class="chip" onclick="chipSelect(this)">Resistenza</div>
-            </div>
-          </div>
           <div class="field-row"><span class="field-label">La tua città</span>
             <input type="text" id="onboardCity" placeholder="es. Cava de' Tirreni">
-          </div>
-          <div class="field-row"><span class="field-label">Il tuo livello</span>
-            <div class="chips" id="onboardLevel">
-              <div class="chip" onclick="chipSelect(this)">Principiante</div>
-              <div class="chip active" onclick="chipSelect(this)">Intermedio</div>
-              <div class="chip" onclick="chipSelect(this)">Avanzato</div>
-            </div>
           </div>
         </div>
         <button class="primary-btn" style="margin-top:16px;" onclick="completeOnboarding()">Continua</button>
@@ -649,14 +634,20 @@
           <div class="ai-pane active" id="paneScheda">
             <div class="gate-box">
               <span class="field-label">Obiettivo</span>
-              <div class="chips" style="margin-bottom:14px;">
+              <div class="chips" id="schedaGoalChips" style="margin-bottom:14px;">
                 <div class="chip active" onclick="chipSelect(this)">Tonificazione</div>
                 <div class="chip" onclick="chipSelect(this)">Massa muscolare</div>
                 <div class="chip" onclick="chipSelect(this)">Dimagrimento</div>
                 <div class="chip" onclick="chipSelect(this)">Resistenza</div>
               </div>
+              <span class="field-label">Il tuo livello</span>
+              <div class="chips" id="schedaLevelChips" style="margin-bottom:14px;">
+                <div class="chip" onclick="chipSelect(this)">Principiante</div>
+                <div class="chip active" onclick="chipSelect(this)">Intermedio</div>
+                <div class="chip" onclick="chipSelect(this)">Avanzato</div>
+              </div>
               <span class="field-label">Giorni a settimana</span>
-              <div class="chips">
+              <div class="chips" id="schedaDaysChips">
                 <div class="chip" onclick="chipSelect(this)">2</div>
                 <div class="chip active" onclick="chipSelect(this)">3</div>
                 <div class="chip" onclick="chipSelect(this)">4</div>
@@ -769,25 +760,23 @@
         </div>
       </div>
 
-      <div class="section-label">Il tuo account</div>
-      <div class="filter-card" style="margin:0 20px 18px;">
-        <span class="field-label">Tipo di account</span>
-        <div class="chips" id="profileAccountType" style="margin-bottom:14px;">
-          <div class="chip active" data-type="persona" onclick="selectProfileAccountType(this,'persona')">Persona</div>
-          <div class="chip" data-type="palestra" onclick="selectProfileAccountType(this,'palestra')">Palestra</div>
-          <div class="chip" data-type="personal_trainer" onclick="selectProfileAccountType(this,'personal_trainer')">Personal trainer</div>
-        </div>
-        <div id="profileBizFields" style="display:none;">
-          <div class="field-row"><span class="field-label">Nome attività</span><input type="text" id="profileBizName" placeholder="es. Palestra Olympus"></div>
-          <div class="field-row"><textarea id="profileBizBio" placeholder="Descrivi i tuoi servizi" style="min-height:60px;"></textarea></div>
-          <div class="field-row"><input type="text" id="profileBizPrice" placeholder="es. € 35/sessione"></div>
-          <div class="safety-card" style="margin-bottom:0;">
-            <span class="ic">♿</span>
-            <div class="t"><b>Accessibile a persone con disabilità</b><span>Mostra il badge nel Marketplace</span></div>
-            <div class="switch" id="profileAccessSwitch" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+      <div id="accountSection" style="display:none;">
+        <div class="section-label">La tua attività</div>
+        <div class="filter-card" style="margin:0 20px 18px;">
+          <span class="field-label">Tipo di account</span>
+          <p id="accountTypeLabel" style="font-size:14px; font-weight:700; color:var(--signal); margin:0 0 16px;">—</p>
+          <div id="profileBizFields">
+            <div class="field-row"><span class="field-label">Nome attività</span><input type="text" id="profileBizName" placeholder="es. Palestra Olympus"></div>
+            <div class="field-row"><span class="field-label">Descrizione del servizio</span><textarea id="profileBizBio" placeholder="Descrivi i tuoi servizi" style="min-height:60px;"></textarea></div>
+            <div class="field-row"><span class="field-label">Tariffario</span><input type="text" id="profileBizPrice" placeholder="es. € 35/sessione"></div>
+            <div class="safety-card" style="margin-bottom:0;">
+              <span class="ic">♿</span>
+              <div class="t"><b>Accessibile a persone con disabilità</b><span>Mostra il badge nel Marketplace</span></div>
+              <div class="switch" id="profileAccessSwitch" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+            </div>
           </div>
+          <button class="primary-btn" style="margin-top:14px; padding:12px;" onclick="saveProfileSettings()">Salva</button>
         </div>
-        <button class="primary-btn" style="margin-top:14px; padding:12px;" onclick="saveProfileSettings()">Salva</button>
       </div>
 
       <div class="section-label">Ultime 18 settimane</div>
@@ -1102,17 +1091,13 @@
   }
 
   async function completeOnboarding(){
-    const goalEl = document.querySelector("#onboardGoal .chip.active");
-    const levelEl = document.querySelector("#onboardLevel .chip.active");
     const city = document.getElementById("onboardCity").value.trim();
     try {
       await supabaseClient.from("profiles").update({
-        goal: goalEl ? goalEl.textContent.trim() : null,
-        level: levelEl ? levelEl.textContent.trim() : null,
         city: city || null,
         onboarded: true
       }).eq("id", currentUser.id);
-      if(currentProfile) currentProfile.onboarded = true;
+      if(currentProfile){ currentProfile.onboarded = true; currentProfile.city = city || null; }
     } catch(e){}
     go("home");
   }
@@ -1140,40 +1125,33 @@
         if(refEl) refEl.textContent = data.referral_code || "——";
         document.getElementById("adminLinkBtn").style.display = data.is_admin ? "inline-block" : "none";
 
-        const typeChips = document.querySelectorAll("#profileAccountType .chip");
-        typeChips.forEach(c => c.classList.toggle("active", c.getAttribute("data-type") === (data.account_type || "persona")));
-        document.getElementById("profileBizFields").style.display = (data.account_type && data.account_type !== "persona") ? "block" : "none";
-        if(data.business_name) document.getElementById("profileBizName").value = data.business_name;
-        if(data.business_bio) document.getElementById("profileBizBio").value = data.business_bio;
-        if(data.business_price) document.getElementById("profileBizPrice").value = data.business_price;
-        document.getElementById("profileAccessSwitch").classList.toggle("on", !!data.accessible_disability);
+        const isBusiness = data.account_type && data.account_type !== "persona";
+        document.getElementById("accountSection").style.display = isBusiness ? "block" : "none";
+        if(isBusiness){
+          document.getElementById("accountTypeLabel").textContent = data.account_type === "palestra" ? "Palestra" : "Personal trainer";
+          if(data.business_name) document.getElementById("profileBizName").value = data.business_name;
+          if(data.business_bio) document.getElementById("profileBizBio").value = data.business_bio;
+          if(data.business_price) document.getElementById("profileBizPrice").value = data.business_price;
+          document.getElementById("profileAccessSwitch").classList.toggle("on", !!data.accessible_disability);
+        }
 
         loadWeeklyChallenge();
       }
     } catch(e){}
   }
 
-  function selectProfileAccountType(el, type){
-    el.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-    el.classList.add("active");
-    el.setAttribute("data-type", type);
-    document.getElementById("profileBizFields").style.display = (type === "persona") ? "none" : "block";
-  }
-
   async function saveProfileSettings(){
-    const typeEl = document.querySelector("#profileAccountType .chip.active");
-    const accountType = typeEl ? (typeEl.getAttribute("data-type") || "persona") : "persona";
+    // Il tipo di account si decide solo in fase di registrazione: qui si aggiornano
+    // solo i dati del servizio (tariffario, descrizione, accessibilità).
     const accessible = document.getElementById("profileAccessSwitch").classList.contains("on");
     try {
       await supabaseClient.from("profiles").update({
-        account_type: accountType,
         business_name: document.getElementById("profileBizName").value.trim() || null,
         business_bio: document.getElementById("profileBizBio").value.trim() || null,
         business_price: document.getElementById("profileBizPrice").value.trim() || null,
         accessible_disability: accessible
       }).eq("id", currentUser.id);
-      if(currentProfile) currentProfile.account_type = accountType;
-      toast("Profilo aggiornato!");
+      toast("Dati attività aggiornati!");
     } catch(e){
       toast("Salvataggio non riuscito, riprova");
     }
@@ -1904,16 +1882,18 @@
     const box = document.getElementById("schedaResultBox");
     document.getElementById("schedaResult").style.display = "block";
 
-    const goalEl = document.querySelector("#paneScheda .chips:nth-of-type(1) .chip.active");
-    const daysEl = document.querySelector("#paneScheda .chips:nth-of-type(2) .chip.active");
+    const goalEl = document.querySelector("#schedaGoalChips .chip.active");
+    const levelEl = document.querySelector("#schedaLevelChips .chip.active");
+    const daysEl = document.querySelector("#schedaDaysChips .chip.active");
     const goal = goalEl ? goalEl.textContent.trim() : "Tonificazione";
+    const level = levelEl ? levelEl.textContent.trim() : "Intermedio";
     const days = daysEl ? daysEl.textContent.trim() : "3";
 
     try {
       const res = await fetch("/api/generate-scheda", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: goal, days: days })
+        body: JSON.stringify({ goal: goal, level: level, days: days })
       });
       if(!res.ok) throw new Error("request_failed");
       const plan = await res.json();
