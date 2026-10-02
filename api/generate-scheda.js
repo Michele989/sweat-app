@@ -10,12 +10,14 @@ module.exports = async (req, res) => {
     const safeDays = String(days || '3').replace('+', '');
 
     const prompt =
-      "Crea una scheda di allenamento settimanale breve per un'app fitness " +
+      "Crea una scheda di allenamento settimanale per un'app fitness " +
       "(contesto dimostrativo, non un vero piano clinico). " +
       `Obiettivo: ${safeGoal}. Giorni a settimana disponibili: ${safeDays}. ` +
       `Rispondi SOLO con un array JSON di ${safeDays} oggetti, uno per giorno di allenamento, ognuno con: ` +
-      '{"day": "sigla breve del giorno (es. LUN)", "title": "titolo breve", "detail": "dettaglio breve, max 12 parole"}. ' +
-      'Testo in italiano, generico e sicuro, nessun numero di ripetizioni estremo. Rispondi SOLO con il JSON.';
+      '{"day": "sigla breve del giorno (es. LUN)", "title": "titolo breve del giorno (es. Petto e Tricipiti)", ' +
+      '"detail": "elenco di 3-5 esercizi concreti con serie x ripetizioni, separati da · (es. \'Panca piana 4x8-10 · Croci manubri 3x12 · Dip 3x12\')"}. ' +
+      'Testo in italiano, generico e sicuro (nessun carico assoluto in kg, solo serie x ripetizioni), nessun numero di ripetizioni estremo. ' +
+      'Rispondi SOLO con il JSON, senza testo prima o dopo.';
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -26,7 +28,7 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 500,
+        max_tokens: 700,
         messages: [{ role: 'user', content: prompt }]
       })
     });
