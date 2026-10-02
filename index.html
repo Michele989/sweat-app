@@ -199,6 +199,22 @@
   .propose-btn.sent{background:var(--signal); color:#06210A; border-color:var(--signal);}
 
   .group-card{margin:0 20px 16px; padding:16px; border-radius:16px; background:linear-gradient(135deg, var(--signal-dim), rgba(87,225,59,0.02)); border:1px solid var(--hairline);}
+  .sponsor-banner{margin:16px 20px; padding:16px; border-radius:16px; background:linear-gradient(135deg, rgba(87,225,59,0.14), rgba(87,225,59,0.02)); border:1px solid var(--signal); display:flex; align-items:center; gap:12px;}
+  .sponsor-banner .tagsp{font-size:10px; font-weight:700; color:var(--signal); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;}
+  .sponsor-banner b{display:block; font-size:14px; margin-bottom:2px;}
+  .sponsor-banner span{font-size:12px; color:var(--fog);}
+  .admin-report-row{padding:14px 20px; border-bottom:1px solid var(--hairline); font-size:13px;}
+  .admin-report-row button{margin-top:8px; background:var(--panel-2); border:1px solid var(--hairline); color:var(--paper); font-size:11.5px; font-weight:600; padding:6px 12px; border-radius:16px; cursor:pointer; font-family:inherit;}
+  .sponsor-admin-row{display:flex; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid var(--hairline); font-size:13px;}
+  .sponsor-admin-row .flex1{flex:1;}
+  .msg-bubble{max-width:75%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.4;}
+  .msg-bubble.me{align-self:flex-end; background:var(--signal); color:#06210A;}
+  .msg-bubble.them{align-self:flex-start; background:var(--panel); border:1px solid var(--hairline);}
+  .conv-row{display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--hairline); cursor:pointer;}
+  .conv-row .ci{flex:1; min-width:0;}
+  .conv-row .cn{font-weight:600; font-size:14px;}
+  .conv-row .cp{font-size:12.5px; color:var(--fog); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .badge-access{display:inline-block; font-size:10.5px; font-weight:700; color:#06210A; background:var(--signal); padding:3px 8px; border-radius:10px; margin-top:4px;}
   .group-card .g-title{font-family:'Barlow Condensed'; font-weight:700; font-size:17px; margin-bottom:4px;}
   .group-card .g-sub{font-size:12.5px; color:var(--fog); margin-bottom:12px;}
 
@@ -371,8 +387,8 @@
       <div class="search-wrap" style="padding-top:20px;">
         <div class="filter-card">
           <div class="tab-switch" style="margin:0 0 18px;">
-            <button class="active" id="authTabLogin" onclick="switchAuthTab('login')">Accedi</button>
-            <button id="authTabRegister" onclick="switchAuthTab('register')">Registrati</button>
+            <button class="active" id="authTabLogin" data-i18n="accedi" onclick="switchAuthTab('login')">Accedi</button>
+            <button id="authTabRegister" data-i18n="registrati" onclick="switchAuthTab('register')">Registrati</button>
           </div>
 
           <div class="field-row">
@@ -387,6 +403,21 @@
             <span class="field-label">Come vuoi chiamarti nell'app?</span>
             <input type="text" id="authName" placeholder="Il tuo nome">
           </div>
+          <div class="field-row" id="authTypeRow" style="display:none;">
+            <span class="field-label">Ti registri come</span>
+            <div class="chips">
+              <div class="chip active" onclick="selectAccountType(this,'persona')">Persona</div>
+              <div class="chip" onclick="selectAccountType(this,'palestra')">Palestra</div>
+              <div class="chip" onclick="selectAccountType(this,'personal_trainer')">Personal trainer</div>
+            </div>
+          </div>
+          <div class="field-row" id="authBizNote" style="display:none;">
+            <div class="warn-box show" style="color:#D8DEDA; background:rgba(87,225,59,0.08); border-color:rgba(87,225,59,0.3);">Account attività: visibile nel Marketplace. Sweat trattiene una commissione del 3% sui guadagni generati tramite l'app.</div>
+          </div>
+
+          <div style="text-align:right; margin-bottom:4px;" id="forgotRow">
+            <a href="#" onclick="handleForgotPassword(); return false;" style="font-size:12.5px; color:var(--fog); text-decoration:underline;">Password dimenticata?</a>
+          </div>
 
           <div class="warn-box" id="authError" style="margin-top:4px;"></div>
 
@@ -396,12 +427,44 @@
       </div>
     </section>
 
+    <!-- ================= ONBOARDING ================= -->
+    <section class="screen" id="screen-onboarding">
+      <div class="home-head">
+        <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
+      </div>
+      <div class="search-wrap" style="padding-top:10px;">
+        <h2 style="font-family:'Barlow Condensed'; font-size:26px; margin:0 0 6px;">Raccontaci di te</h2>
+        <p style="font-size:13.5px; color:var(--fog); margin:0 0 18px;">Ci mette un attimo, e ci aiuta a mostrarti le persone e i contenuti giusti.</p>
+        <div class="filter-card">
+          <div class="field-row"><span class="field-label">Il tuo obiettivo principale</span>
+            <div class="chips" id="onboardGoal">
+              <div class="chip active" onclick="chipSelect(this)">Dimagrimento</div>
+              <div class="chip" onclick="chipSelect(this)">Massa muscolare</div>
+              <div class="chip" onclick="chipSelect(this)">Tonificazione</div>
+              <div class="chip" onclick="chipSelect(this)">Resistenza</div>
+            </div>
+          </div>
+          <div class="field-row"><span class="field-label">La tua città</span>
+            <input type="text" id="onboardCity" placeholder="es. Cava de' Tirreni">
+          </div>
+          <div class="field-row"><span class="field-label">Il tuo livello</span>
+            <div class="chips" id="onboardLevel">
+              <div class="chip" onclick="chipSelect(this)">Principiante</div>
+              <div class="chip active" onclick="chipSelect(this)">Intermedio</div>
+              <div class="chip" onclick="chipSelect(this)">Avanzato</div>
+            </div>
+          </div>
+        </div>
+        <button class="primary-btn" style="margin-top:16px;" onclick="completeOnboarding()">Continua</button>
+      </div>
+    </section>
+
     <section class="screen" id="screen-home">
       <div class="home-head">
         <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
         <div style="display:flex; gap:8px;">
           <button class="icon-btn" onclick="shareApp()" aria-label="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/></svg></button>
-          <button class="cta-small" onclick="go('feed')">Entra nell'app</button>
+          <button class="cta-small" data-i18n="entra" onclick="go('feed')">Entra nell'app</button>
         </div>
       </div>
 
@@ -410,10 +473,10 @@
         <svg class="shape" style="bottom:-30px; left:-40px; width:120px; height:120px;" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#57E13B" stroke-width="2" opacity="0.35"/></svg>
         <div class="lede">È il momento di</div>
         <h1 class="hero-font">MUOVERSI<br>SUL SERIO</h1>
-        <p>Sweat è il social di chi corre, si allena e non si ferma mai. Trova compagni vicino a te, allenati in sicurezza, cresci ogni settimana.</p>
+        <p>Sweat è il social di chi corre, si allena e non si ferma mai. Unisciti a un gruppo, scrivi con chi condivide i tuoi obiettivi, cresci ogni settimana.</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap; position:relative; z-index:2;">
-          <button class="big-cta" onclick="go('feed')">Entra nell'app</button>
-          <button class="big-cta" style="background:transparent; border:1px solid var(--signal); color:var(--signal);" onclick="shareApp()">Condividi demo</button>
+          <button class="big-cta" data-i18n="entra" onclick="go('feed')">Entra nell'app</button>
+          <button class="big-cta" data-i18n="condividi" style="background:transparent; border:1px solid var(--signal); color:var(--signal);" onclick="shareApp()">Condividi demo</button>
         </div>
       </div>
 
@@ -426,7 +489,7 @@
       <div class="home-section-title">Perché scegliere Sweat</div>
       <div class="feat-grid">
         <div class="feat-cell"><span class="ic">🌙</span><h4>Sempre attivo,<br>a qualsiasi ora</h4><p>Trova compagni di corsa 24 ore su 24, tutti i giorni dell'anno.</p></div>
-        <div class="feat-cell"><span class="ic">🛟</span><h4>Corri in<br>sicurezza</h4><p>Condividi la corsa live con un contatto e usa l'SOS in un tap.</p></div>
+        <div class="feat-cell"><span class="ic">👥</span><h4>Gruppi e<br>community</h4><p>Crea o unisciti a un gruppo di allenamento nella tua città.</p></div>
         <div class="feat-cell"><span class="ic">🧑‍🏫</span><h4>Coach e<br>nutrizionisti</h4><p>Prenota sessioni con personal trainer del tuo quartiere, in app.</p></div>
         <div class="feat-cell"><span class="ic">🏆</span><h4>Sfide e<br>premi reali</h4><p>Accumula punti ogni settimana e sblocca sconti nei negozi sportivi.</p></div>
         <div class="feat-cell"><span class="ic">🤖</span><h4>Piani su<br>misura</h4><p>Allenamenti generati in base ai tuoi progressi, settimana per settimana.</p></div>
@@ -439,9 +502,9 @@
         <ul class="promo-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Trovare compagni di corsa vicino a te</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Prenotare coach e nutrizionisti in zona</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Sincronizzare Strava, Garmin, Apple Health e Google Fit</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Creare gruppi e scrivere direttamente con altri utenti</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Partecipare a sfide con premi reali</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Attivare la modalità sicurezza durante la corsa</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Accumulare punti e scalare la classifica settimanale</li>
         </ul>
         <div class="store-row">
           <div class="store-btn">App Store<span>Scarica ora</span></div>
@@ -454,27 +517,16 @@
 
     <!-- ================= FEED ================= -->
     <section class="screen" id="screen-feed">
-      <div class="stories">
-        <div class="story"><div class="ring live"><div class="avatar a2" style="width:100%;height:100%;">G</div></div><span class="live-tag">In diretta</span><span class="label">Giulia</span></div>
-        <div class="story"><div class="ring"><div class="avatar a1" style="width:100%;height:100%;">M</div></div><span class="label">Marco</span></div>
-        <div class="story"><div class="ring"><div class="avatar a3" style="width:100%;height:100%;">S</div></div><span class="label">Sara</span></div>
-        <div class="story"><div class="ring"><div class="avatar a4" style="width:100%;height:100%;">TC</div></div><span class="label">Team Cava</span></div>
-        <div class="story"><div class="ring"><div class="avatar a5" style="width:100%;height:100%;">+</div></div><span class="label">Aggiungi</span></div>
-      </div>
-
-      <div class="clip-row">
-        <div class="clip"><div class="clip-len">0:18</div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="clip-name">Marco · scatto finale</div></div>
-        <div class="clip"><div class="clip-len">0:32</div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="clip-name">Team Cava · uscita</div></div>
-        <div class="clip"><div class="clip-len">0:12</div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="clip-name">Sara · stretching</div></div>
-        <div class="clip"><div class="clip-len">0:25</div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="clip-name">Elena Coach · consigli</div></div>
-      </div>
+      <div id="feedSponsorBanner"></div>
 
       <div id="dynamicPosts"></div>
+
+      <div style="padding:14px 20px 0; font-size:11.5px; color:var(--fog-dim); text-transform:uppercase; letter-spacing:0.5px;">Post di esempio</div>
 
       <article class="post">
         <div class="post-head">
           <div class="avatar a1" style="width:42px;height:42px;">M</div>
-          <div class="who"><div class="name">Marco Fusco</div><div class="meta">Cava de' Tirreni · 43 min fa</div></div>
+          <div class="who"><div class="name">Marco Fusco</div><div class="meta">Cava de' Tirreni · esempio</div></div>
           <span class="tag">Corsa</span>
         </div>
         <div class="post-photo">
@@ -489,109 +541,41 @@
         <div class="actions">
           <button class="action-btn kudos" onclick="toggleKudos(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="count">128</span></button>
           <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"/><path d="M3 12.5a8.5 8.5 0 0 0 15 5"/></svg>14</button>
-          <button class="action-btn" onclick="go('cerca')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Corri con lui</button>
-        </div>
-      </article>
-
-      <article class="post">
-        <div class="post-head">
-          <div class="avatar a3" style="width:42px;height:42px;">GR</div>
-          <div class="who"><div class="name">Giulia Rescigno</div><div class="meta">Palestra Olympus · 2 h fa</div></div>
-          <span class="tag alt">Palestra</span>
-        </div>
-        <div class="stat-strip"><div class="stat"><b>+5 kg</b><span>panca piana</span></div><div class="stat"><b>52 min</b><span>durata</span></div><div class="stat"><b>6</b><span>esercizi</span></div></div>
-        <p class="caption">Panca piana: <b>+5 kg</b> rispetto al mese scorso. Piccoli numeri, grandi soddisfazioni.</p>
-        <div class="actions">
-          <button class="action-btn kudos" onclick="toggleKudos(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="count">76</span></button>
-          <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"/><path d="M3 12.5a8.5 8.5 0 0 0 15 5"/></svg>9</button>
-        </div>
-      </article>
-
-      <article class="post">
-        <div class="post-head">
-          <div class="avatar a4" style="width:42px;height:42px;">TC</div>
-          <div class="who"><div class="name">Team Cava Runners</div><div class="meta">Gruppo · Villa Comunale</div></div>
-          <span class="tag alt">Evento</span>
-        </div>
-        <p class="caption">Uscita di gruppo <b>domenica alle 7:30</b> dalla Villa Comunale. Ritmo libero, tutti i livelli benvenuti.</p>
-        <div class="actions">
-          <button class="action-btn kudos" onclick="toggleKudos(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="count">31</span></button>
-          <button class="action-btn" onclick="go('cerca')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Partecipa</button>
         </div>
       </article>
     </section>
 
     <!-- ================= CERCA ================= -->
-    <section class="screen" id="screen-cerca">
+    <section class="screen" id="screen-gruppi">
       <div class="search-wrap">
-        <div class="safety-card">
-          <span class="ic">🛟</span>
-          <div class="t"><b>Modalità sicurezza</b><span>Condividi la corsa live con un contatto</span></div>
-          <div class="switch on" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
-          <button class="sos-btn" onclick="toast('SOS inviato ai tuoi contatti!')">SOS</button>
-        </div>
-
         <div class="filter-card">
-          <div class="field-row"><span class="field-label">Città</span>
-            <select id="cityFilter"><option>Cava de' Tirreni</option><option>Salerno</option><option>Vietri sul Mare</option><option>Nocera Inferiore</option></select>
-          </div>
-          <div class="field-row"><span class="field-label">Raggio di ricerca — <span class="range-value" id="radiusVal">5 km</span></span>
-            <input type="range" min="1" max="30" value="5" id="radiusSlider" oninput="updateRadius(this.value)">
-          </div>
-          <div class="field-row"><span class="field-label">Quando</span>
-            <div class="chips"><div class="chip active" onclick="chipSelect(this)">Oggi</div><div class="chip" onclick="chipSelect(this)">Domani</div><div class="chip" onclick="chipSelect(this)">Weekend</div><div class="chip" onclick="chipSelect(this)">Scegli data</div></div>
-          </div>
-          <div class="field-row"><span class="field-label">Attività</span>
-            <div class="chips"><div class="chip active" onclick="chipSelect(this)">Corsa</div><div class="chip" onclick="chipSelect(this)">Camminata</div><div class="chip" onclick="chipSelect(this)">Ciclismo</div><div class="chip" onclick="chipSelect(this)">Trekking</div></div>
-          </div>
-          <div class="field-row"><span class="field-label">Livello</span>
-            <div class="chips"><div class="chip" onclick="chipSelect(this)">Principiante</div><div class="chip active" onclick="chipSelect(this)">Intermedio</div><div class="chip" onclick="chipSelect(this)">Avanzato</div></div>
-          </div>
+          <span class="field-label">Crea un nuovo gruppo</span>
+          <div class="field-row"><input type="text" id="newGroupName" placeholder="Nome del gruppo"></div>
+          <div class="field-row"><input type="text" id="newGroupCity" placeholder="Città"></div>
+          <div class="field-row"><textarea id="newGroupDesc" placeholder="Di cosa si occupa questo gruppo?" style="min-height:60px;"></textarea></div>
+          <button class="primary-btn" style="padding:12px;" onclick="createGroup()">Crea gruppo</button>
         </div>
       </div>
-
-      <div class="group-card">
-        <div class="g-title">Team Cava Runners</div>
-        <div class="g-sub">24 iscritti · Uscita sabato 07:00 · Lungomare</div>
-        <button class="primary-btn" style="padding:11px;" onclick="toast('Richiesta inviata al gruppo!')">Unisciti al gruppo</button>
-      </div>
-
-      <div class="results-head"><h3>Persone compatibili</h3><span id="resultsCount">4 nel raggio</span></div>
-      <div id="matchList">
-        <div class="match-card" data-dist="1.2"><div class="avatar a3">AL</div><div class="match-info"><div class="name-row"><span class="name">Antonio Landi</span><span class="dist">1,2 km</span></div><div class="sub">Ritmo simile: 5:10/km · Libero oggi dalle 18:30</div></div><button class="propose-btn" onclick="proposeRun(this)">Proponi</button></div>
-        <div class="match-card" data-dist="2.8"><div class="avatar a2">SR</div><div class="match-info"><div class="name-row"><span class="name">Sara Russo</span><span class="dist">2,8 km</span></div><div class="sub">Ritmo simile: 5:20/km · Preferisce mattina presto</div></div><button class="propose-btn" onclick="proposeRun(this)">Proponi</button></div>
-        <div class="match-card" data-dist="4.5"><div class="avatar a1">DP</div><div class="match-info"><div class="name-row"><span class="name">Davide Pepe</span><span class="dist">4,5 km</span></div><div class="sub">Ritmo simile: 4:55/km · Allenamento a intervalli</div></div><button class="propose-btn" onclick="proposeRun(this)">Proponi</button></div>
-        <div class="match-card" data-dist="9.1"><div class="avatar a4">FC</div><div class="match-info"><div class="name-row"><span class="name">Francesca Conte</span><span class="dist">9,1 km</span></div><div class="sub">Ritmo simile: 5:35/km · Weekend, corse lunghe</div></div><button class="propose-btn" onclick="proposeRun(this)">Proponi</button></div>
-      </div>
+      <div class="results-head"><h3>Gruppi e club</h3><span id="groupsCount">0 gruppi</span></div>
+      <div id="groupsList"></div>
     </section>
 
-    <!-- ================= ESPLORA ================= -->
+    <!-- ================= MARKETPLACE (ESPLORA) ================= -->
     <section class="screen" id="screen-esplora">
-      <div class="map-box">
-        <svg viewBox="0 0 400 230" preserveAspectRatio="none">
-          <rect width="400" height="230" fill="#131511"/>
-          <g stroke="#20241D" stroke-width="2"><line x1="0" y1="60" x2="400" y2="50"/><line x1="0" y1="130" x2="400" y2="150"/><line x1="70" y1="0" x2="40" y2="230"/><line x1="230" y1="0" x2="260" y2="230"/><line x1="330" y1="0" x2="350" y2="230"/></g>
-        </svg>
-        <div class="pin" style="top:38%; left:22%;"></div>
-        <div class="pin" style="top:60%; left:48%;"></div>
-        <div class="pin pulse2" style="top:30%; left:70%;"></div>
-        <div class="pin" style="top:75%; left:80%;"></div>
-        <div class="pin pulse2" style="top:50%; left:15%;"></div>
+      <div class="search-wrap" style="padding-bottom:4px;">
+        <div class="safety-card">
+          <span class="ic">♿</span>
+          <div class="t"><b>Solo accessibili</b><span>Mostra solo palestre/coach per persone con disabilità</span></div>
+          <div class="switch" id="accessFilterSwitch" onclick="toggleAccessFilter()"><div class="knob"></div></div>
+        </div>
       </div>
-
-      <div class="section-label">In zona ora</div>
-      <div class="live-row"><div class="dot-s"></div><div class="txt"><b>3 persone</b> stanno correndo vicino a te</div><div class="when">ora</div></div>
-      <div class="live-row"><div class="dot-s" style="background:#FFC65B;"></div><div class="txt"><b>Palestra Olympus</b> ha posti liberi per la lezione 19:00</div><div class="when">stasera</div></div>
-
-      <div class="section-label">Coach e palestre vicino a te</div>
-      <div class="coach-card"><div class="avatar a1">EC</div><div class="coach-info"><div class="name">Elena Cioffi</div><div class="role">Personal trainer · corsa</div><div class="sub">⭐ 4.9 · € 35/sessione</div></div><button class="book-btn" onclick="toast('Richiesta di prenotazione inviata a Elena!')">Prenota</button></div>
-      <div class="coach-card"><div class="avatar a3">NB</div><div class="coach-info"><div class="name">Nicola Barone</div><div class="role">Nutrizionista sportivo</div><div class="sub">⭐ 4.8 · Prima consulenza gratuita</div></div><button class="book-btn" onclick="toast('Richiesta di prenotazione inviata a Nicola!')">Prenota</button></div>
-      <div class="coach-card"><div class="avatar a4">PO</div><div class="coach-info"><div class="name">Palestra Olympus</div><div class="role">Sala pesi + corsi di gruppo</div><div class="sub">⭐ 4.7 · Cava de' Tirreni</div></div><button class="book-btn" onclick="toast('Richiesta inviata a Palestra Olympus!')">Prenota</button></div>
-
-      <div class="section-label">Eventi in programma</div>
-      <div class="live-row"><div class="dot-s"></div><div class="txt"><b>10 km di Cava</b> — gara cittadina, iscrizioni aperte</div><div class="when">12 ott</div></div>
-      <div class="live-row"><div class="dot-s"></div><div class="txt"><b>Uscita MTB Valico di Chiunzi</b></div><div class="when">sab 07:00</div></div>
-      <div class="live-row"><div class="dot-s"></div><div class="txt"><b>Yoga all'alba</b> — Villa Comunale</div><div class="when">dom 06:30</div></div>
+      <div class="section-label">Coach e palestre</div>
+      <div id="marketplaceList"></div>
+      <div class="group-card">
+        <div class="g-title">Offri i tuoi servizi su Sweat</div>
+        <div class="g-sub">Palestre e personal trainer possono registrarsi come attività e ricevere richieste dirette. Commissione Sweat: 3% sui guadagni generati in app.</div>
+        <button class="primary-btn" style="padding:11px;" onclick="go('profilo')">Registra la tua attività</button>
+      </div>
     </section>
 
     <!-- ================= CREA ================= -->
@@ -614,6 +598,7 @@
           <div class="t"><b>6,2 km · 32:14</b>Dati importati automaticamente dal tuo orologio</div>
         </div>
         <span class="field-label">Racconta come è andata</span>
+        <div class="field-row"><span class="field-label">Distanza in km (facoltativo, usata per sfide e classifica)</span><input type="text" id="creaDistance" placeholder="es. 8,4" inputmode="decimal"></div>
         <textarea id="creaCaption" placeholder="Com'è andato l'allenamento di oggi?" style="margin-top:8px;"></textarea>
         <button class="primary-btn" onclick="publishWorkout()">Pubblica allenamento</button>
       </div>
@@ -744,40 +729,69 @@
         <div class="avatar a1" id="profileAvatar">MC</div>
         <h2 id="profileName">Michele Cioffi</h2>
         <p id="profileEmail">Cava de' Tirreni · Corridore da 2 anni</p>
-        <button class="propose-btn" style="margin-top:10px;" onclick="handleLogout()">Esci dall'account</button>
+        <div style="display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap;">
+          <button class="propose-btn" data-i18n="messaggi" onclick="go('messaggi')">Messaggi</button>
+          <button class="propose-btn" id="adminLinkBtn" data-i18n="admin" style="display:none;" onclick="go('admin')">Pannello Admin</button>
+          <button class="propose-btn" data-i18n="esci" onclick="handleLogout()">Esci dall'account</button>
+        </div>
       </div>
       <div class="stat-row">
-        <div class="stat-box"><b>84 km</b><span>questo mese</span></div>
-        <div class="stat-box"><b id="statWorkouts">14</b><span>allenamenti</span></div>
-        <div class="stat-box"><b>9 gg</b><span>streak</span></div>
+        <div class="stat-box"><b id="statKm">0 km</b><span>questo mese</span></div>
+        <div class="stat-box"><b id="statWorkouts">0</b><span>allenamenti</span></div>
+        <div class="stat-box"><b id="statPoints">0</b><span>punti Sweat</span></div>
       </div>
 
       <div class="challenge-card">
-        <div class="top-row"><b>Sfida della settimana</b><span>32/50 km</span></div>
-        <div class="bar-bg"><div class="bar-fill" style="width:64%;"></div></div>
-        <div class="rank-row me"><span>1. Tu</span><b>32 km</b></div>
-        <div class="rank-row"><span>2. Antonio Landi</span><b>29 km</b></div>
-        <div class="rank-row"><span>3. Sara Russo</span><b>24 km</b></div>
+        <div class="top-row"><b>Sfida della settimana</b><span id="challengeProgress">0/50 km</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="challengeBar" style="width:0%;"></div></div>
+        <div id="leaderboardList"><div class="rank-row"><span>Pubblica un allenamento per entrare in classifica</span></div></div>
       </div>
 
       <div class="points-card">
-        <div><div class="num">1.240</div><div class="lbl">Punti Sweat</div></div>
-        <div class="offer"><b>-15% Runners Point</b><button onclick="toast('Sconto riscattato! Codice inviato via email.')">Riscatta</button></div>
+        <div><div class="num" id="pointsNum">0</div><div class="lbl">Punti Sweat</div></div>
+        <div class="offer" id="sponsorOffer"><b>Nessuna offerta attiva</b></div>
       </div>
 
-      <div class="section-label">Dispositivi collegati</div>
-      <div class="sync-row"><div class="ic">⌚</div><div class="nm">Strava</div><span class="connected">Collegato ✓</span></div>
-      <div class="sync-row"><div class="ic">📟</div><div class="nm">Garmin Connect</div><button onclick="toast('Garmin collegato!')">Collega</button></div>
-      <div class="sync-row"><div class="ic">🍏</div><div class="nm">Apple Health</div><button onclick="toast('Apple Health collegato!')">Collega</button></div>
-      <div class="sync-row"><div class="ic">🟢</div><div class="nm">Google Fit</div><button onclick="toast('Google Fit collegato!')">Collega</button></div>
+      <div class="section-label">Invita un amico</div>
+      <div class="filter-card" style="margin:0 20px 18px;">
+        <p style="font-size:13px; color:var(--fog); margin:0 0 10px;">Condividi il tuo codice: ogni amico che si registra ti fa guadagnare punti.</p>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <div style="flex:1; background:var(--panel-2); border:1px solid var(--hairline); border-radius:10px; padding:10px 14px; font-family:'Barlow Condensed'; font-size:18px; letter-spacing:1px;" id="referralCodeBox">——</div>
+          <button class="propose-btn" onclick="shareReferral()">Condividi</button>
+        </div>
+      </div>
+
+      <div class="section-label">Lingua / Language</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <div class="chips">
+          <div class="chip active" id="langChipIt" onclick="setLanguage('it')">Italiano</div>
+          <div class="chip" id="langChipEn" onclick="setLanguage('en')">English</div>
+        </div>
+      </div>
+
+      <div class="section-label">Il tuo account</div>
+      <div class="filter-card" style="margin:0 20px 18px;">
+        <span class="field-label">Tipo di account</span>
+        <div class="chips" id="profileAccountType" style="margin-bottom:14px;">
+          <div class="chip active" data-type="persona" onclick="selectProfileAccountType(this,'persona')">Persona</div>
+          <div class="chip" data-type="palestra" onclick="selectProfileAccountType(this,'palestra')">Palestra</div>
+          <div class="chip" data-type="personal_trainer" onclick="selectProfileAccountType(this,'personal_trainer')">Personal trainer</div>
+        </div>
+        <div id="profileBizFields" style="display:none;">
+          <div class="field-row"><span class="field-label">Nome attività</span><input type="text" id="profileBizName" placeholder="es. Palestra Olympus"></div>
+          <div class="field-row"><textarea id="profileBizBio" placeholder="Descrivi i tuoi servizi" style="min-height:60px;"></textarea></div>
+          <div class="field-row"><input type="text" id="profileBizPrice" placeholder="es. € 35/sessione"></div>
+          <div class="safety-card" style="margin-bottom:0;">
+            <span class="ic">♿</span>
+            <div class="t"><b>Accessibile a persone con disabilità</b><span>Mostra il badge nel Marketplace</span></div>
+            <div class="switch" id="profileAccessSwitch" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+          </div>
+        </div>
+        <button class="primary-btn" style="margin-top:14px; padding:12px;" onclick="saveProfileSettings()">Salva</button>
+      </div>
 
       <div class="section-label">Ultime 18 settimane</div>
       <div class="heat-wrap"><div class="heat-grid" id="heatGrid"></div></div>
-
-      <div class="section-label">Record personali</div>
-      <div class="pr-row"><span>5 km</span><b>22:41</b></div>
-      <div class="pr-row"><span>10 km</span><b>48:03</b></div>
-      <div class="pr-row"><span>Mezza maratona</span><b>1:52:17</b></div>
 
       <div class="section-label">Traguardi</div>
       <div class="badge-grid">
@@ -788,21 +802,69 @@
       </div>
     </section>
 
+    <!-- ================= MESSAGGI ================= -->
+    <section class="screen" id="screen-messaggi">
+      <div class="results-head"><h3>Conversazioni</h3></div>
+      <div id="conversationsList"></div>
+    </section>
+
+    <section class="screen" id="screen-chat">
+      <div id="chatThread" style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;"></div>
+      <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
+        <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." style="flex:1;">
+        <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendChatMessage()">Invia</button>
+      </div>
+    </section>
+
+    <!-- ================= PROFILO DI UN ALTRO UTENTE ================= -->
+    <section class="screen" id="screen-altroprofilo">
+      <div class="profile-head">
+        <div class="avatar a2" id="otherAvatar">??</div>
+        <h2 id="otherName">—</h2>
+        <p id="otherMeta">—</p>
+        <button class="propose-btn" style="margin-top:10px;" id="otherMessageBtn" onclick="startChatWithOther()">Scrivi un messaggio</button>
+      </div>
+      <div id="otherBizInfo"></div>
+    </section>
+
+    <!-- ================= PANNELLO ADMIN ================= -->
+    <section class="screen" id="screen-admin">
+      <div class="stat-row">
+        <div class="stat-box"><b id="adminUserCount">0</b><span>utenti</span></div>
+        <div class="stat-box"><b id="adminPostCount">0</b><span>post</span></div>
+        <div class="stat-box"><b id="adminReportCount">0</b><span>segnalazioni</span></div>
+      </div>
+
+      <div class="section-label">Segnalazioni</div>
+      <div id="adminReportsList"><div class="live-row"><div class="txt">Nessuna segnalazione</div></div></div>
+
+      <div class="section-label">Sponsor / pubblicità in app</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <div class="filter-card">
+          <div class="field-row"><input type="text" id="sponsorTitle" placeholder="Titolo (es. -15% da Runners Point)"></div>
+          <div class="field-row"><input type="text" id="sponsorDesc" placeholder="Descrizione breve"></div>
+          <div class="field-row"><input type="text" id="sponsorLink" placeholder="Link (opzionale)"></div>
+          <button class="primary-btn" style="padding:12px;" onclick="createSponsor()">Pubblica sponsor</button>
+        </div>
+      </div>
+      <div id="adminSponsorsList"></div>
+    </section>
+
   </main>
 
   <nav class="tabbar hidden" id="tabbar">
-    <button class="tab active" data-tab="feed" onclick="go('feed')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg><span>Feed</span></button>
-    <button class="tab" data-tab="cerca" onclick="go('cerca')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Cerca</span></button>
+    <button class="tab active" data-tab="feed" onclick="go('feed')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-i18n="feed">Feed</span></button>
+    <button class="tab" data-tab="gruppi" onclick="go('gruppi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.5 2.8-5.5 6-5.5s6 2 6 5.5"/><path d="M14.5 15c2.5 0.3 4.5 2 4.5 5"/></svg><span data-i18n="gruppi">Gruppi</span></button>
     <button class="tab fab" onclick="go('ai')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg><span>AI</span></button>
-    <button class="tab" data-tab="esplora" onclick="go('esplora')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg><span>Esplora</span></button>
-    <button class="tab" data-tab="profilo" onclick="go('profilo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Profilo</span></button>
+    <button class="tab" data-tab="esplora" onclick="go('esplora')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M3 15h18M9 3v18"/></svg><span data-i18n="market">Market</span></button>
+    <button class="tab" data-tab="profilo" onclick="go('profilo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span data-i18n="profilo">Profilo</span></button>
   </nav>
 
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
-  const titles = {cerca:"Corri con me", esplora:"Esplora", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin"};
 
   // ================= NAVIGAZIONE =================
   function go(name){
@@ -813,21 +875,31 @@
     const tabbar = document.getElementById('tabbar');
     const mainArea = document.getElementById('mainArea');
 
-    if(name==='home' || name==='auth'){
+    if(name==='home' || name==='auth' || name==='onboarding'){
       topbar.classList.add('hidden'); tabbar.classList.add('hidden'); mainArea.classList.add('no-nav');
     } else {
-      topbar.classList.remove('hidden'); tabbar.classList.remove('hidden'); mainArea.classList.remove('no-nav');
+      topbar.classList.remove('hidden'); mainArea.classList.remove('no-nav');
+      if(name==='chat'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       const btn = document.querySelector('.tab[data-tab="'+name+'"]');
       if(btn) btn.classList.add('active');
       const shareIcon = `<div class="icon-btn" onclick="shareApp()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/></svg></div>`;
       const addIcon = `<div class="icon-btn" onclick="go('crea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div>`;
       if(name==='feed'){
-        topbar.innerHTML = `<div class="wordmark" onclick="go('home')"><span class="dot"></span>SWEAT</div><div class="head-actions"><div class="icon-btn has-dot" onclick="toggleNotif(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>${addIcon}${shareIcon}<div class="notif-panel" id="notifPanel"><div class="notif-item"><b>3 persone stanno correndo vicino a te</b>Nella tua zona, adesso</div><div class="notif-item"><b>+50 punti Sweat</b>Per la sfida della settimana</div><div class="notif-item"><b>Nuovo messaggio</b>Elena, il tuo coach, ti ha scritto</div></div></div>`;
+        topbar.innerHTML = `<div class="wordmark" onclick="go('home')"><span class="dot"></span>SWEAT</div><div class="head-actions"><div class="icon-btn has-dot" id="notifBellBtn" onclick="toggleNotif(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>${addIcon}${shareIcon}<div class="notif-panel" id="notifPanel"></div></div>`;
+        renderNotifPanel();
+        loadFeedSponsor();
       } else {
-        topbar.innerHTML = `<div class="screen-title">${titles[name] || ""}</div><div class="head-actions">${shareIcon}</div>`;
+        let customTitle = titles[name] || "";
+        if(name==='chat' && currentChatPartner) customTitle = currentChatPartner.name;
+        if(name==='altroprofilo' && currentOtherProfile) customTitle = currentOtherProfile.name;
+        topbar.innerHTML = `<div class="screen-title">${customTitle}</div><div class="head-actions">${shareIcon}</div>`;
       }
     }
+    if(name==='gruppi') loadGroups();
+    if(name==='esplora') loadMarketplace();
+    if(name==='messaggi') loadConversations();
+    if(name==='admin') loadAdminData();
     mainArea.scrollTo(0,0);
   }
 
@@ -848,7 +920,10 @@
 
   function toggleNotif(e){
     e.stopPropagation();
-    document.getElementById('notifPanel').classList.toggle('show');
+    const panel = document.getElementById('notifPanel');
+    const wasShown = panel.classList.contains('show');
+    panel.classList.toggle('show');
+    if(!wasShown) markNotificationsRead();
   }
   document.addEventListener('click', function(){
     const p = document.getElementById('notifPanel');
@@ -866,19 +941,43 @@
   let currentProfile = null;   // riga della tabella "profiles"
   let authMode = "login";
 
+  let signupAccountType = "persona";
+  let pendingReferralCode = null;
+  let currentChatPartner = null;
+  let currentOtherProfile = null;
+
   async function initApp(){
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if(params.get("ref")) pendingReferralCode = params.get("ref");
+    } catch(e){}
+
     if(!supabaseClient){
       const errBox = document.getElementById("authError");
       errBox.textContent = "Configura prima SUPABASE_URL e SUPABASE_ANON_KEY in cima al file HTML.";
       errBox.classList.add("show");
       return;
     }
+
+    supabaseClient.auth.onAuthStateChange(function(event, session){
+      if(event === "PASSWORD_RECOVERY"){
+        const pw = window.prompt("Imposta la tua nuova password (almeno 6 caratteri):");
+        if(pw && pw.length >= 6){
+          supabaseClient.auth.updateUser({ password: pw }).then(function(res){
+            if(!res.error) toast("Password aggiornata! Ora puoi accedere normalmente.");
+          });
+        }
+      }
+    });
+
     try {
       const { data } = await supabaseClient.auth.getSession();
       if(data && data.session){
         await onAuthed(data.session.user);
       }
     } catch(e){}
+
+    applyLanguage(localStorage.getItem("sweatLang") || "it");
   }
 
   function switchAuthTab(mode){
@@ -886,8 +985,36 @@
     document.getElementById("authTabLogin").classList.toggle("active", mode==="login");
     document.getElementById("authTabRegister").classList.toggle("active", mode==="register");
     document.getElementById("authNameRow").style.display = mode==="register" ? "block" : "none";
+    document.getElementById("authTypeRow").style.display = mode==="register" ? "block" : "none";
+    document.getElementById("forgotRow").style.display = mode==="register" ? "none" : "block";
     document.getElementById("authSubmitBtn").textContent = mode==="register" ? "Crea account" : "Accedi";
     document.getElementById("authError").classList.remove("show");
+  }
+
+  function selectAccountType(el, type){
+    el.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+    el.classList.add("active");
+    signupAccountType = type;
+    document.getElementById("authBizNote").style.display = (type === "persona") ? "none" : "block";
+  }
+
+  async function handleForgotPassword(){
+    const errBox = document.getElementById("authError");
+    const email = document.getElementById("authEmail").value.trim();
+    if(!email){
+      errBox.textContent = "Scrivi prima la tua email qui sopra, poi premi di nuovo questo link.";
+      errBox.classList.add("show");
+      return;
+    }
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+      if(error) throw error;
+      errBox.textContent = "Ti abbiamo inviato un'email per reimpostare la password.";
+      errBox.classList.add("show");
+    } catch(e){
+      errBox.textContent = e.message || "Impossibile inviare l'email, riprova.";
+      errBox.classList.add("show");
+    }
   }
 
   async function handleAuthSubmit(){
@@ -915,7 +1042,7 @@
         const { data, error } = await supabaseClient.auth.signUp({
           email: email,
           password: password,
-          options: { data: { full_name: name || email.split("@")[0] } }
+          options: { data: { full_name: name || email.split("@")[0], account_type: signupAccountType } }
         });
         if(error) throw error;
         if(data.session){
@@ -951,7 +1078,42 @@
   async function onAuthed(user){
     currentUser = { id: user.id, email: user.email };
     await loadProfile();
+    await applyReferralIfAny();
     await loadRealPosts();
+    await loadNotifications();
+    if(currentProfile && !currentProfile.onboarded){
+      go("onboarding");
+    } else {
+      go("home");
+    }
+  }
+
+  async function applyReferralIfAny(){
+    if(!pendingReferralCode || !currentProfile || currentProfile.referred_by) return;
+    try {
+      const { data: refProfile } = await supabaseClient.from("profiles").select("id,points").eq("referral_code", pendingReferralCode).single();
+      if(refProfile && refProfile.id !== currentUser.id){
+        await supabaseClient.from("profiles").update({ referred_by: refProfile.id }).eq("id", currentUser.id);
+        await supabaseClient.from("profiles").update({ points: (refProfile.points || 0) + 50 }).eq("id", refProfile.id);
+        currentProfile.referred_by = refProfile.id;
+      }
+    } catch(e){}
+    pendingReferralCode = null;
+  }
+
+  async function completeOnboarding(){
+    const goalEl = document.querySelector("#onboardGoal .chip.active");
+    const levelEl = document.querySelector("#onboardLevel .chip.active");
+    const city = document.getElementById("onboardCity").value.trim();
+    try {
+      await supabaseClient.from("profiles").update({
+        goal: goalEl ? goalEl.textContent.trim() : null,
+        level: levelEl ? levelEl.textContent.trim() : null,
+        city: city || null,
+        onboarded: true
+      }).eq("id", currentUser.id);
+      if(currentProfile) currentProfile.onboarded = true;
+    } catch(e){}
     go("home");
   }
 
@@ -965,13 +1127,85 @@
         const emailEl = document.getElementById("profileEmail");
         const avEl = document.getElementById("profileAvatar");
         const wEl = document.getElementById("statWorkouts");
+        const pointsEl = document.getElementById("statPoints");
+        const pointsNumEl = document.getElementById("pointsNum");
+        const refEl = document.getElementById("referralCodeBox");
         const displayName = data.name || currentUser.email;
         if(nameEl) nameEl.textContent = displayName;
-        if(emailEl) emailEl.textContent = currentUser.email;
+        if(emailEl) emailEl.textContent = currentUser.email + (data.city ? " · " + data.city : "");
         if(avEl) avEl.textContent = displayName.slice(0,2).toUpperCase();
         if(wEl && typeof data.workouts === "number") wEl.textContent = data.workouts;
+        if(pointsEl) pointsEl.textContent = data.points || 0;
+        if(pointsNumEl) pointsNumEl.textContent = data.points || 0;
+        if(refEl) refEl.textContent = data.referral_code || "——";
+        document.getElementById("adminLinkBtn").style.display = data.is_admin ? "inline-block" : "none";
+
+        const typeChips = document.querySelectorAll("#profileAccountType .chip");
+        typeChips.forEach(c => c.classList.toggle("active", c.getAttribute("data-type") === (data.account_type || "persona")));
+        document.getElementById("profileBizFields").style.display = (data.account_type && data.account_type !== "persona") ? "block" : "none";
+        if(data.business_name) document.getElementById("profileBizName").value = data.business_name;
+        if(data.business_bio) document.getElementById("profileBizBio").value = data.business_bio;
+        if(data.business_price) document.getElementById("profileBizPrice").value = data.business_price;
+        document.getElementById("profileAccessSwitch").classList.toggle("on", !!data.accessible_disability);
+
+        loadWeeklyChallenge();
       }
     } catch(e){}
+  }
+
+  function selectProfileAccountType(el, type){
+    el.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+    el.classList.add("active");
+    el.setAttribute("data-type", type);
+    document.getElementById("profileBizFields").style.display = (type === "persona") ? "none" : "block";
+  }
+
+  async function saveProfileSettings(){
+    const typeEl = document.querySelector("#profileAccountType .chip.active");
+    const accountType = typeEl ? (typeEl.getAttribute("data-type") || "persona") : "persona";
+    const accessible = document.getElementById("profileAccessSwitch").classList.contains("on");
+    try {
+      await supabaseClient.from("profiles").update({
+        account_type: accountType,
+        business_name: document.getElementById("profileBizName").value.trim() || null,
+        business_bio: document.getElementById("profileBizBio").value.trim() || null,
+        business_price: document.getElementById("profileBizPrice").value.trim() || null,
+        accessible_disability: accessible
+      }).eq("id", currentUser.id);
+      if(currentProfile) currentProfile.account_type = accountType;
+      toast("Profilo aggiornato!");
+    } catch(e){
+      toast("Salvataggio non riuscito, riprova");
+    }
+  }
+
+  function shareReferral(){
+    const code = (currentProfile && currentProfile.referral_code) || "";
+    const url = window.location.origin + window.location.pathname + "?ref=" + code;
+    const shareData = { title: "Sweat", text: "Unisciti a me su Sweat! Usa il mio codice invito.", url: url };
+    if(navigator.share){ navigator.share(shareData).catch(()=>{}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>toast("Link invito copiato!")); }
+  }
+
+  // ================= LINGUA (prima versione) =================
+  const LANG = {
+    it: { feed:"Feed", gruppi:"Gruppi", market:"Market", profilo:"Profilo", ai:"AI", entra:"Entra nell'app", condividi:"Condividi demo", accedi:"Accedi", registrati:"Registrati", messaggi:"Messaggi", admin:"Pannello Admin", esci:"Esci dall'account" },
+    en: { feed:"Feed", gruppi:"Groups", market:"Market", profilo:"Profile", ai:"AI", entra:"Enter the app", condividi:"Share demo", accedi:"Log in", registrati:"Sign up", messaggi:"Messages", admin:"Admin panel", esci:"Log out" }
+  };
+
+  function setLanguage(lang){
+    localStorage.setItem("sweatLang", lang);
+    applyLanguage(lang);
+  }
+
+  function applyLanguage(lang){
+    const dict = LANG[lang] || LANG.it;
+    document.getElementById("langChipIt").classList.toggle("active", lang==="it");
+    document.getElementById("langChipEn").classList.toggle("active", lang==="en");
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      const key = el.getAttribute("data-i18n");
+      if(dict[key]) el.textContent = dict[key];
+    });
   }
 
   // ================= FEED REALE =================
@@ -1009,12 +1243,18 @@
       head.className = "post-head";
       const av = document.createElement("div");
       av.className = "avatar a1";
-      av.style.width = "42px"; av.style.height = "42px";
+      av.style.width = "42px"; av.style.height = "42px"; av.style.cursor = "pointer";
       av.textContent = (p.author_name || "??").slice(0,2).toUpperCase();
+      av.onclick = function(){ viewProfile(p.author_id); };
       const who = document.createElement("div");
       who.className = "who";
+      who.style.cursor = "pointer";
+      who.onclick = function(){ viewProfile(p.author_id); };
       const nm = document.createElement("div"); nm.className = "name"; nm.textContent = p.author_name || "Utente Sweat";
-      const meta = document.createElement("div"); meta.className = "meta"; meta.textContent = "Ora";
+      const metaLine = [];
+      if(p.distance_km) metaLine.push(Number(p.distance_km) + " km");
+      metaLine.push("Ora");
+      const meta = document.createElement("div"); meta.className = "meta"; meta.textContent = metaLine.join(" · ");
       who.appendChild(nm); who.appendChild(meta);
       const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = p.type || "Allenamento";
       head.appendChild(av); head.appendChild(who); head.appendChild(tag);
@@ -1042,7 +1282,16 @@
       kudos.appendChild(svg);
       kudos.appendChild(countSpan);
 
+      const reportBtn = document.createElement("button");
+      reportBtn.className = "action-btn";
+      reportBtn.style.marginLeft = "auto";
+      reportBtn.style.fontSize = "11px";
+      reportBtn.style.color = "var(--fog-dim)";
+      reportBtn.textContent = "Segnala";
+      reportBtn.onclick = function(){ reportPost(p.id); };
+
       actions.appendChild(kudos);
+      actions.appendChild(reportBtn);
       art.appendChild(head); art.appendChild(cap); art.appendChild(actions);
       wrap.appendChild(art);
     });
@@ -1053,6 +1302,8 @@
     const type = activeType ? activeType.textContent : "Allenamento";
     const captionEl = document.getElementById("creaCaption");
     const caption = (captionEl.value || "").trim() || "Allenamento completato 💪";
+    const distRaw = (document.getElementById("creaDistance").value || "").replace(",", ".").trim();
+    const distance = distRaw ? parseFloat(distRaw) : null;
 
     if(!supabaseClient || !currentUser){
       toast("Devi accedere per pubblicare");
@@ -1063,7 +1314,8 @@
         author_id: currentUser.id,
         author_name: (currentProfile && currentProfile.name) || currentUser.email,
         type: type,
-        caption: caption
+        caption: caption,
+        distance_km: (distance && !isNaN(distance)) ? distance : null
       }).select().single();
       if(error) throw error;
       data._likedByMe = false;
@@ -1071,6 +1323,7 @@
       renderDynamicPosts();
       bumpWorkoutCount();
       captionEl.value = "";
+      document.getElementById("creaDistance").value = "";
       toast("Pubblicato nel feed di tutti!");
       go("feed");
     } catch(e){
@@ -1081,14 +1334,466 @@
   async function bumpWorkoutCount(){
     if(!supabaseClient || !currentUser) return;
     try {
-      const next = ((currentProfile && currentProfile.workouts) || 0) + 1;
-      const { error } = await supabaseClient.from("profiles").update({ workouts: next }).eq("id", currentUser.id);
+      const nextWorkouts = ((currentProfile && currentProfile.workouts) || 0) + 1;
+      const nextPoints = ((currentProfile && currentProfile.points) || 0) + 10;
+      const { error } = await supabaseClient.from("profiles").update({ workouts: nextWorkouts, points: nextPoints }).eq("id", currentUser.id);
       if(!error){
-        if(currentProfile) currentProfile.workouts = next;
+        if(currentProfile){ currentProfile.workouts = nextWorkouts; currentProfile.points = nextPoints; }
         const el = document.getElementById("statWorkouts");
-        if(el) el.textContent = next;
+        if(el) el.textContent = nextWorkouts;
+        const pEl = document.getElementById("statPoints");
+        if(pEl) pEl.textContent = nextPoints;
+        const pnEl = document.getElementById("pointsNum");
+        if(pnEl) pnEl.textContent = nextPoints;
+      }
+      loadWeeklyChallenge();
+    } catch(e){}
+  }
+
+  // ================= SFIDA SETTIMANALE E CLASSIFICA REALI =================
+  async function loadWeeklyChallenge(){
+    if(!supabaseClient || !currentUser) return;
+    try {
+      const now = new Date();
+      const day = now.getDay() === 0 ? 7 : now.getDay();
+      const monday = new Date(now); monday.setDate(now.getDate() - day + 1); monday.setHours(0,0,0,0);
+
+      const { data } = await supabaseClient.from("posts").select("author_id,author_name,distance_km,created_at").gte("created_at", monday.toISOString());
+      const totals = {};
+      (data || []).forEach(function(row){
+        if(!row.distance_km) return;
+        const key = row.author_id || row.author_name;
+        if(!totals[key]) totals[key] = { name: row.author_name, km: 0, id: row.author_id };
+        totals[key].km += Number(row.distance_km);
+      });
+      const ranking = Object.values(totals).sort(function(a,b){ return b.km - a.km; }).slice(0,5);
+
+      const myTotal = totals[currentUser.id] ? totals[currentUser.id].km : 0;
+      const goalKm = 50;
+      document.getElementById("challengeProgress").textContent = Math.round(myTotal) + "/" + goalKm + " km";
+      document.getElementById("challengeBar").style.width = Math.min(100, Math.round(myTotal/goalKm*100)) + "%";
+
+      const list = document.getElementById("leaderboardList");
+      if(ranking.length === 0){
+        list.innerHTML = '<div class="rank-row"><span>Pubblica un allenamento con la distanza per entrare in classifica</span></div>';
+      } else {
+        list.innerHTML = "";
+        ranking.forEach(function(r, i){
+          const row = document.createElement("div");
+          row.className = "rank-row" + (r.id === currentUser.id ? " me" : "");
+          const span = document.createElement("span"); span.textContent = (i+1) + ". " + (r.id === currentUser.id ? "Tu" : (r.name || "Utente"));
+          const b = document.createElement("b"); b.textContent = Math.round(r.km) + " km";
+          row.appendChild(span); row.appendChild(b);
+          list.appendChild(row);
+        });
+      }
+
+      // Km del mese per la card statistiche in alto
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const { data: monthData } = await supabaseClient.from("posts").select("distance_km").eq("author_id", currentUser.id).gte("created_at", monthStart.toISOString());
+      const monthKm = (monthData || []).reduce(function(sum, r){ return sum + (Number(r.distance_km) || 0); }, 0);
+      const kmEl = document.getElementById("statKm");
+      if(kmEl) kmEl.textContent = Math.round(monthKm) + " km";
+    } catch(e){}
+  }
+
+  // ================= GRUPPI / CLUB ================= 
+  let realGroups = [];
+  let myGroupIds = new Set();
+
+  async function loadGroups(){
+    if(!supabaseClient) return;
+    try {
+      const { data } = await supabaseClient.from("groups").select("*").order("created_at", { ascending: false }).limit(30);
+      realGroups = data || [];
+      if(currentUser){
+        const { data: mine } = await supabaseClient.from("group_members").select("group_id").eq("user_id", currentUser.id);
+        myGroupIds = new Set((mine || []).map(r => r.group_id));
+      }
+      renderGroupsList();
+    } catch(e){}
+  }
+
+  function renderGroupsList(){
+    const wrap = document.getElementById("groupsList");
+    document.getElementById("groupsCount").textContent = realGroups.length + " gruppi";
+    wrap.innerHTML = "";
+    realGroups.forEach(function(g){
+      const card = document.createElement("div");
+      card.className = "group-card";
+      const title = document.createElement("div"); title.className = "g-title"; title.textContent = g.name;
+      const sub = document.createElement("div"); sub.className = "g-sub"; sub.textContent = (g.members_count || 1) + " iscritti" + (g.city ? " · " + g.city : "") + (g.description ? " · " + g.description : "");
+      const btn = document.createElement("button");
+      const joined = myGroupIds.has(g.id);
+      btn.className = "primary-btn"; btn.style.padding = "11px";
+      btn.textContent = joined ? "Esci dal gruppo" : "Unisciti al gruppo";
+      btn.onclick = function(){ joined ? leaveGroup(g.id) : joinGroup(g.id); };
+      card.appendChild(title); card.appendChild(sub); card.appendChild(btn);
+      wrap.appendChild(card);
+    });
+  }
+
+  async function createGroup(){
+    const name = document.getElementById("newGroupName").value.trim();
+    const city = document.getElementById("newGroupCity").value.trim();
+    const desc = document.getElementById("newGroupDesc").value.trim();
+    if(!name){ toast("Dai un nome al gruppo"); return; }
+    if(!currentUser){ toast("Devi accedere per creare un gruppo"); return; }
+    try {
+      const { data, error } = await supabaseClient.from("groups").insert({ name: name, city: city || null, description: desc || null, creator_id: currentUser.id }).select().single();
+      if(error) throw error;
+      await supabaseClient.from("group_members").insert({ group_id: data.id, user_id: currentUser.id });
+      document.getElementById("newGroupName").value = "";
+      document.getElementById("newGroupCity").value = "";
+      document.getElementById("newGroupDesc").value = "";
+      toast("Gruppo creato!");
+      loadGroups();
+    } catch(e){
+      toast("Creazione non riuscita, riprova");
+    }
+  }
+
+  async function joinGroup(groupId){
+    if(!currentUser){ toast("Devi accedere"); return; }
+    try {
+      await supabaseClient.from("group_members").insert({ group_id: groupId, user_id: currentUser.id });
+      myGroupIds.add(groupId);
+      toast("Ti sei unito al gruppo!");
+      loadGroups();
+    } catch(e){ toast("Operazione non riuscita"); }
+  }
+
+  async function leaveGroup(groupId){
+    try {
+      await supabaseClient.from("group_members").delete().match({ group_id: groupId, user_id: currentUser.id });
+      myGroupIds.delete(groupId);
+      toast("Hai lasciato il gruppo");
+      loadGroups();
+    } catch(e){ toast("Operazione non riuscita"); }
+  }
+
+  // ================= MARKETPLACE (PALESTRE / PERSONAL TRAINER) =================
+  let accessOnlyFilter = false;
+  let realBusinesses = [];
+
+  function toggleAccessFilter(){
+    accessOnlyFilter = !accessOnlyFilter;
+    document.getElementById("accessFilterSwitch").classList.toggle("on", accessOnlyFilter);
+    renderMarketplaceList();
+  }
+
+  async function loadMarketplace(){
+    if(!supabaseClient) return;
+    try {
+      const { data } = await supabaseClient.from("profiles").select("*").in("account_type", ["palestra","personal_trainer"]).limit(50);
+      realBusinesses = data || [];
+      renderMarketplaceList();
+    } catch(e){}
+  }
+
+  function renderMarketplaceList(){
+    const wrap = document.getElementById("marketplaceList");
+    wrap.innerHTML = "";
+    const list = accessOnlyFilter ? realBusinesses.filter(b => b.accessible_disability) : realBusinesses;
+    if(list.length === 0){
+      wrap.innerHTML = '<div class="live-row"><div class="txt">Nessuna attività registrata ancora. Sii il primo!</div></div>';
+      return;
+    }
+    list.forEach(function(b){
+      const card = document.createElement("div");
+      card.className = "coach-card";
+      const av = document.createElement("div"); av.className = "avatar a1";
+      av.textContent = (b.business_name || b.name || "??").slice(0,2).toUpperCase();
+      av.style.cursor = "pointer";
+      av.onclick = function(){ viewProfile(b.id); };
+      const info = document.createElement("div"); info.className = "coach-info";
+      const nm = document.createElement("div"); nm.className = "name"; nm.textContent = b.business_name || b.name;
+      const role = document.createElement("div"); role.className = "role";
+      role.textContent = b.account_type === "palestra" ? "Palestra" : "Personal trainer";
+      const sub = document.createElement("div"); sub.className = "sub";
+      sub.textContent = b.business_price || (b.city || "");
+      info.appendChild(nm); info.appendChild(role); info.appendChild(sub);
+      if(b.accessible_disability){
+        const badge = document.createElement("span"); badge.className = "badge-access"; badge.textContent = "♿ Accessibile";
+        info.appendChild(badge);
+      }
+      const btn = document.createElement("button"); btn.className = "book-btn"; btn.textContent = "Scrivi";
+      btn.onclick = function(){ openChat(b.id, b.business_name || b.name); go("chat"); };
+      card.appendChild(av); card.appendChild(info); card.appendChild(btn);
+      wrap.appendChild(card);
+    });
+  }
+
+  // ================= PROFILO DI UN ALTRO UTENTE =================
+  async function viewProfile(userId){
+    if(!userId || !supabaseClient) return;
+    try {
+      const { data } = await supabaseClient.from("profiles").select("*").eq("id", userId).single();
+      if(!data) return;
+      currentOtherProfile = { id: data.id, name: data.name || "Utente Sweat" };
+      document.getElementById("otherAvatar").textContent = currentOtherProfile.name.slice(0,2).toUpperCase();
+      document.getElementById("otherName").textContent = currentOtherProfile.name;
+      let meta = data.city || "";
+      if(data.level) meta += (meta ? " · " : "") + data.level;
+      document.getElementById("otherMeta").textContent = meta || "Atleta Sweat";
+      const bizWrap = document.getElementById("otherBizInfo");
+      bizWrap.innerHTML = "";
+      if(data.account_type && data.account_type !== "persona"){
+        const card = document.createElement("div");
+        card.className = "filter-card";
+        card.style.margin = "0 20px 18px";
+        const role = document.createElement("p"); role.style.cssText = "font-size:13px;color:var(--signal);font-weight:700;margin:0 0 8px;";
+        role.textContent = data.account_type === "palestra" ? "Palestra" : "Personal trainer";
+        card.appendChild(role);
+        if(data.business_bio){ const p = document.createElement("p"); p.style.cssText="font-size:13px;color:var(--fog);margin:0 0 8px;"; p.textContent = data.business_bio; card.appendChild(p); }
+        if(data.business_price){ const p2 = document.createElement("p"); p2.style.cssText="font-size:14px;font-weight:600;margin:0;"; p2.textContent = data.business_price; card.appendChild(p2); }
+        if(data.accessible_disability){ const badge = document.createElement("span"); badge.className="badge-access"; badge.textContent="♿ Accessibile a persone con disabilità"; card.appendChild(badge); }
+        bizWrap.appendChild(card);
+      }
+      go("altroprofilo");
+    } catch(e){}
+  }
+
+  function startChatWithOther(){
+    if(!currentOtherProfile) return;
+    openChat(currentOtherProfile.id, currentOtherProfile.name);
+    go("chat");
+  }
+
+  // ================= MESSAGGISTICA DIRETTA =================
+  async function loadConversations(){
+    if(!supabaseClient || !currentUser) return;
+    try {
+      const { data } = await supabaseClient.from("messages").select("*").or("sender_id.eq." + currentUser.id + ",receiver_id.eq." + currentUser.id).order("created_at", { ascending: false }).limit(200);
+      const byPartner = {};
+      (data || []).forEach(function(m){
+        const otherId = m.sender_id === currentUser.id ? m.receiver_id : m.sender_id;
+        if(!byPartner[otherId]) byPartner[otherId] = m;
+      });
+      const partnerIds = Object.keys(byPartner);
+      let profilesById = {};
+      if(partnerIds.length){
+        const { data: profs } = await supabaseClient.from("profiles").select("id,name").in("id", partnerIds);
+        (profs || []).forEach(function(p){ profilesById[p.id] = p.name; });
+      }
+      const wrap = document.getElementById("conversationsList");
+      wrap.innerHTML = "";
+      if(partnerIds.length === 0){
+        wrap.innerHTML = '<div class="live-row"><div class="txt">Nessuna conversazione ancora. Scrivi a qualcuno dal Marketplace o da un profilo.</div></div>';
+        return;
+      }
+      partnerIds.forEach(function(pid){
+        const m = byPartner[pid];
+        const row = document.createElement("div");
+        row.className = "conv-row";
+        row.onclick = function(){ openChat(pid, profilesById[pid] || "Utente Sweat"); go("chat"); };
+        const av = document.createElement("div"); av.className = "avatar a3"; av.style.width="44px"; av.style.height="44px";
+        av.textContent = (profilesById[pid] || "??").slice(0,2).toUpperCase();
+        const ci = document.createElement("div"); ci.className = "ci";
+        const cn = document.createElement("div"); cn.className = "cn"; cn.textContent = profilesById[pid] || "Utente Sweat";
+        const cp = document.createElement("div"); cp.className = "cp"; cp.textContent = m.content;
+        ci.appendChild(cn); ci.appendChild(cp);
+        row.appendChild(av); row.appendChild(ci);
+        wrap.appendChild(row);
+      });
+    } catch(e){}
+  }
+
+  async function openChat(otherId, otherName){
+    currentChatPartner = { id: otherId, name: otherName || "Utente Sweat" };
+    try {
+      const { data } = await supabaseClient.from("messages").select("*")
+        .or("and(sender_id.eq." + currentUser.id + ",receiver_id.eq." + otherId + "),and(sender_id.eq." + otherId + ",receiver_id.eq." + currentUser.id + ")")
+        .order("created_at", { ascending: true });
+      const thread = document.getElementById("chatThread");
+      thread.innerHTML = "";
+      (data || []).forEach(function(m){
+        const b = document.createElement("div");
+        b.className = "msg-bubble " + (m.sender_id === currentUser.id ? "me" : "them");
+        b.textContent = m.content;
+        thread.appendChild(b);
+      });
+      // segna come letti i messaggi ricevuti
+      await supabaseClient.from("messages").update({ read: true }).match({ sender_id: otherId, receiver_id: currentUser.id, read: false });
+    } catch(e){}
+  }
+
+  async function sendChatMessage(){
+    const input = document.getElementById("chatInput");
+    const content = input.value.trim();
+    if(!content || !currentChatPartner || !currentUser) return;
+    try {
+      const { data, error } = await supabaseClient.from("messages").insert({
+        sender_id: currentUser.id, receiver_id: currentChatPartner.id, content: content
+      }).select().single();
+      if(error) throw error;
+      const thread = document.getElementById("chatThread");
+      const b = document.createElement("div"); b.className = "msg-bubble me"; b.textContent = content;
+      thread.appendChild(b);
+      input.value = "";
+    } catch(e){ toast("Messaggio non inviato, riprova"); }
+  }
+
+  // ================= NOTIFICHE REALI =================
+  let myNotifications = [];
+
+  async function loadNotifications(){
+    if(!supabaseClient || !currentUser) return;
+    try {
+      const { data } = await supabaseClient.from("notifications").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(20);
+      myNotifications = data || [];
+      renderNotifPanel();
+    } catch(e){}
+  }
+
+  function renderNotifPanel(){
+    const panel = document.getElementById("notifPanel");
+    const bellBtn = document.getElementById("notifBellBtn");
+    if(!panel) return;
+    panel.innerHTML = "";
+    if(myNotifications.length === 0){
+      panel.innerHTML = '<div class="notif-item">Nessuna notifica, per ora</div>';
+    } else {
+      myNotifications.forEach(function(n){
+        const item = document.createElement("div");
+        item.className = "notif-item";
+        item.textContent = n.content;
+        panel.appendChild(item);
+      });
+    }
+    const hasUnread = myNotifications.some(function(n){ return !n.read; });
+    if(bellBtn) bellBtn.classList.toggle("has-dot", hasUnread);
+  }
+
+  async function markNotificationsRead(){
+    if(!supabaseClient || !currentUser) return;
+    try {
+      await supabaseClient.from("notifications").update({ read: true }).eq("user_id", currentUser.id).eq("read", false);
+      myNotifications.forEach(function(n){ n.read = true; });
+      const bellBtn = document.getElementById("notifBellBtn");
+      if(bellBtn) bellBtn.classList.remove("has-dot");
+    } catch(e){}
+  }
+
+  // ================= SPONSOR NEL FEED =================
+  async function loadFeedSponsor(){
+    if(!supabaseClient) return;
+    try {
+      const { data } = await supabaseClient.from("sponsors").select("*").eq("active", true).order("created_at", { ascending: false }).limit(1);
+      const wrap = document.getElementById("feedSponsorBanner");
+      if(!wrap) return;
+      if(data && data.length){
+        const s = data[0];
+        wrap.innerHTML = "";
+        const banner = document.createElement("div"); banner.className = "sponsor-banner";
+        const content = document.createElement("div"); content.style.flex = "1";
+        const tag = document.createElement("div"); tag.className = "tagsp"; tag.textContent = "Sponsorizzato";
+        const b = document.createElement("b"); b.textContent = s.title;
+        const span = document.createElement("span"); span.textContent = s.description || "";
+        content.appendChild(tag); content.appendChild(b); content.appendChild(span);
+        banner.appendChild(content);
+        if(s.link){
+          const link = document.createElement("a"); link.href = s.link; link.target = "_blank";
+          link.style.cssText = "color:var(--signal); font-size:12px; font-weight:700;";
+          link.textContent = "Scopri";
+          banner.appendChild(link);
+        }
+        wrap.appendChild(banner);
+      } else {
+        wrap.innerHTML = "";
       }
     } catch(e){}
+  }
+
+  // ================= PANNELLO ADMIN =================
+  async function loadAdminData(){
+    if(!supabaseClient || !currentProfile || !currentProfile.is_admin) return;
+    try {
+      const { count: userCount } = await supabaseClient.from("profiles").select("*", { count: "exact", head: true });
+      const { count: postCount } = await supabaseClient.from("posts").select("*", { count: "exact", head: true });
+      const { data: reports } = await supabaseClient.from("reports").select("*").eq("status", "in_attesa").order("created_at", { ascending: false });
+
+      document.getElementById("adminUserCount").textContent = userCount || 0;
+      document.getElementById("adminPostCount").textContent = postCount || 0;
+      document.getElementById("adminReportCount").textContent = (reports || []).length;
+
+      const repWrap = document.getElementById("adminReportsList");
+      repWrap.innerHTML = "";
+      if(!reports || reports.length === 0){
+        repWrap.innerHTML = '<div class="live-row"><div class="txt">Nessuna segnalazione in attesa</div></div>';
+      } else {
+        reports.forEach(function(r){
+          const row = document.createElement("div"); row.className = "admin-report-row";
+          const p = document.createElement("div"); p.textContent = "Motivo: " + (r.reason || "non specificato");
+          const btn = document.createElement("button"); btn.textContent = "Segna come risolta";
+          btn.onclick = function(){ resolveReport(r.id); };
+          row.appendChild(p); row.appendChild(btn);
+          repWrap.appendChild(row);
+        });
+      }
+
+      loadAdminSponsors();
+    } catch(e){}
+  }
+
+  async function resolveReport(reportId){
+    try {
+      await supabaseClient.from("reports").update({ status: "risolto" }).eq("id", reportId);
+      toast("Segnalazione risolta");
+      loadAdminData();
+    } catch(e){}
+  }
+
+  async function loadAdminSponsors(){
+    try {
+      const { data } = await supabaseClient.from("sponsors").select("*").order("created_at", { ascending: false });
+      const wrap = document.getElementById("adminSponsorsList");
+      wrap.innerHTML = "";
+      (data || []).forEach(function(s){
+        const row = document.createElement("div"); row.className = "sponsor-admin-row";
+        const info = document.createElement("div"); info.className = "flex1";
+        info.innerHTML = "";
+        const b = document.createElement("b"); b.style.display = "block"; b.style.fontSize = "13.5px"; b.textContent = s.title;
+        const span = document.createElement("span"); span.style.color = "var(--fog)"; span.style.fontSize = "11.5px"; span.textContent = s.active ? "Attivo" : "Disattivato";
+        info.appendChild(b); info.appendChild(span);
+        const btn = document.createElement("button"); btn.className = "propose-btn"; btn.textContent = s.active ? "Disattiva" : "Attiva";
+        btn.onclick = function(){ toggleSponsor(s.id, !s.active); };
+        row.appendChild(info); row.appendChild(btn);
+        wrap.appendChild(row);
+      });
+    } catch(e){}
+  }
+
+  async function createSponsor(){
+    const title = document.getElementById("sponsorTitle").value.trim();
+    const desc = document.getElementById("sponsorDesc").value.trim();
+    const link = document.getElementById("sponsorLink").value.trim();
+    if(!title){ toast("Scrivi almeno un titolo"); return; }
+    try {
+      await supabaseClient.from("sponsors").insert({ title: title, description: desc || null, link: link || null, active: true });
+      document.getElementById("sponsorTitle").value = "";
+      document.getElementById("sponsorDesc").value = "";
+      document.getElementById("sponsorLink").value = "";
+      toast("Sponsor pubblicato!");
+      loadAdminSponsors();
+    } catch(e){ toast("Pubblicazione non riuscita"); }
+  }
+
+  async function toggleSponsor(id, newState){
+    try {
+      await supabaseClient.from("sponsors").update({ active: newState }).eq("id", id);
+      loadAdminSponsors();
+    } catch(e){}
+  }
+
+  // ================= SEGNALAZIONE CONTENUTI =================
+  async function reportPost(postId){
+    if(!currentUser){ toast("Devi accedere per segnalare"); return; }
+    const reason = window.prompt("Perché segnali questo post? (facoltativo)") || "non specificato";
+    try {
+      await supabaseClient.from("reports").insert({ post_id: postId, reporter_id: currentUser.id, reason: reason });
+      toast("Segnalazione inviata, grazie");
+    } catch(e){ toast("Segnalazione non riuscita"); }
   }
 
   function toggleKudos(btn){
