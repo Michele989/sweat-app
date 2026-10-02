@@ -347,7 +347,7 @@
   // ====== CONFIGURAZIONE — sostituisci questi due valori con quelli del tuo progetto Supabase ======
   // Li trovi in Supabase: Project Settings -> API -> "Project URL" e "anon public" key
   const SUPABASE_URL = "https://knkuqlhuxskeqptwsdsg.supabase.co";
-  const SUPABASE_ANON_KEY = "anon public:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtua3VxbGh1eHNrZXFwdHdzZHNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NjIzMTMsImV4cCI6MjEwNjUzODMxM30.-D00QUjeEQIdrZzE0ZphtPDTSBfISTGXS9UhUxjbNIs";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtua3VxbGh1eHNrZXFwdHdzZHNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NjIzMTMsImV4cCI6MjEwNjUzODMxM30.-D00QUjeEQIdrZzE0ZphtPDTSBfISTGXS9UhUxjbNIs";
   const supabaseClient = (SUPABASE_URL.startsWith("http"))
     ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
