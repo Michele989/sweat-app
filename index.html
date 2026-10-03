@@ -1073,7 +1073,7 @@
     if(currentProfile && !currentProfile.onboarded){
       go("onboarding");
     } else {
-      go("home");
+      go("feed");
     }
   }
 
@@ -1099,7 +1099,7 @@
       }).eq("id", currentUser.id);
       if(currentProfile){ currentProfile.onboarded = true; currentProfile.city = city || null; }
     } catch(e){}
-    go("home");
+    go("feed");
   }
 
   async function loadProfile(){
