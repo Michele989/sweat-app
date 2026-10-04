@@ -5,16 +5,29 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { goal, level, days } = req.body || {};
+    const { goal, level, days, pro } = req.body || {};
     const safeGoal = String(goal || 'Tonificazione');
     const safeLevel = String(level || 'Intermedio');
     const safeDays = String(days || '3').replace('+', '');
+
+    let proLines = '';
+    if (pro && typeof pro === 'object') {
+      // NB: eventuali condizioni mediche NON arrivano mai qui (il client non le invia).
+      if (pro.age) proLines += `Età: ${pro.age} anni. `;
+      if (pro.sex) proLines += `Sesso: ${pro.sex}. `;
+      if (pro.experienceLevel) proLines += `Livello di esperienza dichiarato: ${pro.experienceLevel}. `;
+      if (Array.isArray(pro.trainingTypes) && pro.trainingTypes.length) proLines += `Attività preferite: ${pro.trainingTypes.join(', ')}. `;
+      if (pro.equipmentAccess) proLines += `Attrezzatura disponibile: ${pro.equipmentAccess.replace('_', ' ')}. `;
+      if (pro.trainingConstraints) proLines += `Vincoli pratici indicati dall'utente: ${pro.trainingConstraints}. `;
+      if (pro.primaryGoal) proLines += `Obiettivo primario a lungo termine: ${pro.primaryGoal}. `;
+    }
 
     const prompt =
       "Crea una scheda di allenamento settimanale per un'app fitness " +
       "(contesto dimostrativo, non un vero piano clinico). " +
       `Obiettivo: ${safeGoal}. Livello della persona: ${safeLevel}. Giorni a settimana disponibili: ${safeDays}. ` +
-      `Adatta la difficolta e il volume degli esercizi al livello dichiarato. ` +
+      (proLines ? `Dati aggiuntivi dell'utente (account Pro): ${proLines}` : '') +
+      `Adatta la difficolta, il volume degli esercizi, l'attrezzatura richiesta e i vincoli pratici ai dati forniti. ` +
       `Rispondi SOLO con un array JSON di ${safeDays} oggetti, uno per giorno di allenamento, ognuno con: ` +
       '{"day": "sigla breve del giorno (es. LUN)", "title": "titolo breve del giorno (es. Petto e Tricipiti)", ' +
       '"detail": "elenco di 3-5 esercizi concreti con serie x ripetizioni, separati da · (es. \'Panca piana 4x8-10 · Croci manubri 3x12 · Dip 3x12\')"}. ' +
@@ -30,7 +43,7 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 700,
+        max_tokens: 800,
         messages: [{ role: 'user', content: prompt }]
       })
     });

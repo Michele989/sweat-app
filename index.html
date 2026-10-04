@@ -346,6 +346,13 @@
   .badge .ic{font-size:22px;}
   .badge .t{font-size:12px; font-weight:600; line-height:1.3;}
   .pr-row{display:flex; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--hairline); font-size:14px;}
+  .log-row{display:flex; justify-content:space-between; align-items:center; padding:12px 20px; border-bottom:1px solid var(--hairline); font-size:13px;}
+  .log-row .ld{color:var(--fog); font-size:11.5px;}
+  .log-row .lv{font-family:'Barlow Condensed'; font-weight:700; font-size:16px; color:var(--signal);}
+  .log-row .ln{color:var(--fog); font-size:11.5px; font-style:italic;}
+  .log-row button{background:none; border:none; color:var(--fog-dim); font-size:11px; cursor:pointer; font-family:inherit;}
+  .suggestion-row{padding:14px 20px; border-bottom:1px solid var(--hairline); font-size:13px;}
+  .suggestion-row .sr-meta{font-size:11px; color:var(--fog); margin-top:6px;}
   .pr-row b{font-family:'Barlow Condensed'; font-size:16px; color:var(--signal);}
 
   nav.tabbar{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; justify-content:space-around; align-items:center; padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px)); background:rgba(7,8,6,0.94); backdrop-filter:blur(10px); border-top:1px solid var(--hairline); z-index:30;}
@@ -419,11 +426,18 @@
             <a href="#" onclick="handleForgotPassword(); return false;" style="font-size:12.5px; color:var(--fog); text-decoration:underline;">Password dimenticata?</a>
           </div>
 
+          <div class="field-row" id="consentRow" style="display:none;">
+            <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+              <input type="checkbox" id="authConsent" style="margin-top:3px; width:16px; height:16px; accent-color:var(--signal); flex-shrink:0;">
+              <span style="font-size:12.5px; color:var(--fog); line-height:1.5;">Ho letto e accetto i <a href="termini.html" target="_blank" style="color:var(--signal);">Termini di Servizio</a> e l'<a href="privacy.html" target="_blank" style="color:var(--signal);">Informativa Privacy</a> di Sweat.</span>
+            </label>
+          </div>
+
           <div class="warn-box" id="authError" style="margin-top:4px;"></div>
 
           <button class="primary-btn" id="authSubmitBtn" onclick="handleAuthSubmit()" style="margin-top:6px;">Accedi</button>
         </div>
-        <p class="ai-disclaimer" style="text-align:center;">Creando un account accetti termini e privacy di Sweat (demo).</p>
+        <p class="ai-disclaimer" style="text-align:center;">Puoi leggere in qualsiasi momento <a href="termini.html" target="_blank" style="color:var(--fog);">Termini di Servizio</a> e <a href="privacy.html" target="_blank" style="color:var(--fog);">Privacy Policy</a> di Sweat.</p>
       </div>
     </section>
 
@@ -594,6 +608,17 @@
       <div class="ai-wrap">
         <p class="ai-intro">Scatta o carica una foto: il coach AI stima corporatura e postura, poi genera una scheda di allenamento e — se vuoi — un piano alimentare su misura.</p>
 
+        <div id="proPromoCard" class="group-card" style="display:none;">
+          <div class="g-title">Coach AI Pro — 4,99€/mese</div>
+          <div class="g-sub">Scheda e piano alimentare calcolati sui tuoi dati reali (età, peso, altezza, obiettivo, allergie, livello) invece di stime generiche. Include monitoraggio di peso e performance nel tempo.</div>
+          <button class="primary-btn" style="padding:11px;" onclick="go('aipro')">Scopri Coach AI Pro</button>
+        </div>
+        <div id="proActiveCard" class="group-card" style="display:none; background:linear-gradient(135deg, rgba(87,225,59,0.18), rgba(87,225,59,0.03));">
+          <div class="g-title">✓ Coach AI Pro attivo</div>
+          <div class="g-sub">Scheda e piano alimentare personalizzati sui tuoi dati reali.</div>
+          <button class="primary-btn" style="padding:11px;" onclick="go('aipro')">Gestisci profilo Pro e monitoraggio</button>
+        </div>
+
         <div id="aiUploadStep">
           <label class="upload-box" for="aiPhotoInput">
             <span class="ic">📷</span>
@@ -714,6 +739,134 @@
       </div>
     </section>
 
+    <!-- ================= COACH AI PRO ================= -->
+    <section class="screen" id="screen-aipro">
+      <div class="search-wrap">
+
+        <div id="proLockedBox" style="display:none;">
+          <div class="filter-card" style="text-align:center;">
+            <p style="font-family:'Barlow Condensed'; font-size:26px; font-weight:800; margin:0 0 8px;">Coach AI Pro</p>
+            <p style="font-size:14px; color:var(--fog); margin:0 0 4px;">4,99€ / mese</p>
+            <p style="font-size:13px; color:#DADEE3; line-height:1.6; margin:16px 0;">Scheda e piano alimentare calcolati sul tuo fabbisogno calorico reale (formula di Mifflin-St Jeor), su misura per età, peso, altezza, obiettivo, livello e allergie — non più stime generiche. Include il monitoraggio di peso e performance nel tempo, con la cronologia sempre a disposizione.</p>
+            <button class="primary-btn" style="padding:14px;" onclick="activatePro()">Sblocca Coach AI Pro</button>
+            <p class="ai-disclaimer" style="margin-top:12px;">Il pagamento reale non è ancora attivo: per ora l'attivazione è in modalità dimostrativa, gratuita, mentre completiamo l'integrazione dei pagamenti.</p>
+          </div>
+        </div>
+
+        <div id="proUnlockedBox" style="display:none;">
+
+          <div class="results-head" style="padding-left:0; padding-right:0;"><h3>Il tuo profilo Pro</h3></div>
+          <div class="filter-card">
+            <span class="field-label">Dati fisici</span>
+            <div class="field-row"><input type="text" id="proAge" placeholder="Età" inputmode="numeric"></div>
+            <div class="field-row"><input type="text" id="proHeight" placeholder="Altezza (cm)" inputmode="decimal"></div>
+            <div class="field-row"><input type="text" id="proWeight" placeholder="Peso attuale (kg)" inputmode="decimal"></div>
+            <div class="chips" style="margin-bottom:14px;" id="proSexChips">
+              <div class="chip active" data-val="uomo" onclick="chipSelect(this)">Uomo</div>
+              <div class="chip" data-val="donna" onclick="chipSelect(this)">Donna</div>
+            </div>
+
+            <span class="field-label">Obiettivo primario</span>
+            <div class="chips" style="margin-bottom:14px;" id="proGoalChips">
+              <div class="chip active" data-val="massa" onclick="chipSelect(this)">Massa</div>
+              <div class="chip" data-val="definizione" onclick="chipSelect(this)">Definizione</div>
+              <div class="chip" data-val="mantenimento" onclick="chipSelect(this)">Mantenimento</div>
+              <div class="chip" data-val="performance" onclick="chipSelect(this)">Performance</div>
+            </div>
+
+            <span class="field-label">Frequenza settimanale</span>
+            <div class="chips" style="margin-bottom:14px;" id="proFreqChips">
+              <div class="chip" onclick="chipSelect(this)">2</div>
+              <div class="chip active" onclick="chipSelect(this)">3</div>
+              <div class="chip" onclick="chipSelect(this)">4</div>
+              <div class="chip" onclick="chipSelect(this)">5+</div>
+            </div>
+
+            <span class="field-label">Tipo di attività (scegli una o più)</span>
+            <div class="chips" style="margin-bottom:14px;" id="proTypeChips">
+              <div class="chip active" onclick="toggleMultiChip(this)">Pesi</div>
+              <div class="chip" onclick="toggleMultiChip(this)">Corsa</div>
+              <div class="chip" onclick="toggleMultiChip(this)">Nuoto</div>
+              <div class="chip" onclick="toggleMultiChip(this)">Ballo</div>
+              <div class="chip" onclick="toggleMultiChip(this)">Corpo libero</div>
+              <div class="chip" onclick="toggleMultiChip(this)">Altro</div>
+            </div>
+
+            <span class="field-label">Attrezzatura disponibile</span>
+            <div class="chips" style="margin-bottom:14px;" id="proEquipChips">
+              <div class="chip active" data-val="palestra_completa" onclick="chipSelect(this)">Palestra completa</div>
+              <div class="chip" data-val="pesi_casa" onclick="chipSelect(this)">Pesi a casa</div>
+              <div class="chip" data-val="corpo_libero" onclick="chipSelect(this)">Solo corpo libero</div>
+            </div>
+
+            <span class="field-label">Livello di esperienza</span>
+            <div class="chips" style="margin-bottom:14px;" id="proLevelChips">
+              <div class="chip" data-val="principiante" onclick="chipSelect(this)">Principiante</div>
+              <div class="chip active" data-val="intermedio" onclick="chipSelect(this)">Intermedio</div>
+              <div class="chip" data-val="avanzato" onclick="chipSelect(this)">Avanzato</div>
+            </div>
+
+            <div class="field-row"><span class="field-label">Vincoli pratici (facoltativo)</span><textarea id="proConstraints" placeholder="es. Voglio evitare la palestra nei giorni affollati" style="min-height:56px;"></textarea></div>
+          </div>
+
+          <div class="filter-card">
+            <span class="field-label">Alimentazione</span>
+            <div class="field-row"><span class="field-label">Alimenti graditi (facoltativo)</span><textarea id="proFoodLikes" placeholder="es. Pollo, riso, frutti di bosco" style="min-height:50px;"></textarea></div>
+            <div class="field-row"><span class="field-label">Alimenti da evitare, non allergie (facoltativo)</span><textarea id="proFoodDislikes" placeholder="es. Non mi piace il pesce" style="min-height:50px;"></textarea></div>
+            <div class="safety-card" style="margin-bottom:0;">
+              <span class="ic">🍽️</span>
+              <div class="t"><b>Varietà nei pasti</b><span>Evita di ripetere sempre gli stessi piatti</span></div>
+              <div class="switch on" id="proVarietySwitch" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <span class="field-label">Routine quotidiana</span>
+            <div class="field-row"><span class="field-label">Orario sveglia</span><input type="time" id="proWakeTime" value="07:00"></div>
+            <span class="field-label">Lavoro</span>
+            <div class="chips" id="proWorkChips">
+              <div class="chip active" data-val="ufficio" onclick="chipSelect(this)">Ufficio</div>
+              <div class="chip" data-val="smart_working" onclick="chipSelect(this)">Smart working</div>
+              <div class="chip" data-val="misto" onclick="chipSelect(this)">Misto</div>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <span class="field-label">Salute (facoltativo, solo per la tua sicurezza)</span>
+            <div class="field-row"><textarea id="proMedical" placeholder="Condizioni mediche rilevanti, se presenti" style="min-height:50px;"></textarea></div>
+            <div class="ai-disclaimer" style="margin-top:0; margin-bottom:12px;">Questo testo non viene mai inviato al Coach AI né usato per personalizzare scheda o dieta: serve solo per mostrarti un avviso a consultare un medico prima di procedere.</div>
+            <div class="field-row"><span class="field-label">Integratori che usi (facoltativo)</span><input type="text" id="proSupplements" placeholder="es. Creatina, proteine in polvere"></div>
+          </div>
+
+          <button class="primary-btn" style="padding:14px;" onclick="saveProProfile()">Salva profilo Pro</button>
+          <div id="proCalorieResult" class="insight-cell" style="display:none; margin-top:14px;"></div>
+
+          <div class="results-head" style="padding-left:0; padding-right:0; margin-top:28px;"><h3>Monitoraggio peso</h3></div>
+          <div class="filter-card">
+            <div class="field-row" style="display:flex; gap:10px;">
+              <input type="text" id="weightLogValue" placeholder="Peso oggi (kg)" inputmode="decimal" style="flex:1;">
+              <input type="text" id="weightLogNote" placeholder="Nota (facoltativa)" style="flex:1;">
+            </div>
+            <button class="propose-btn" onclick="addWeightLog()">Registra peso</button>
+          </div>
+          <div id="weightLogList"></div>
+
+          <div class="results-head" style="padding-left:0; padding-right:0; margin-top:20px;"><h3>Monitoraggio performance</h3></div>
+          <div class="filter-card">
+            <div class="field-row"><input type="text" id="perfExercise" placeholder="Esercizio (es. Panca piana)"></div>
+            <div class="field-row" style="display:flex; gap:10px;">
+              <input type="text" id="perfWeight" placeholder="Kg" inputmode="decimal" style="flex:1;">
+              <input type="text" id="perfReps" placeholder="Ripetizioni" inputmode="numeric" style="flex:1;">
+              <input type="text" id="perfSets" placeholder="Serie" inputmode="numeric" style="flex:1;">
+            </div>
+            <button class="propose-btn" onclick="addPerformanceLog()">Registra performance</button>
+          </div>
+          <div id="performanceLogList"></div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- ================= PROFILO ================= -->
     <section class="screen" id="screen-profilo">
       <div class="profile-head">
@@ -779,6 +932,14 @@
         </div>
       </div>
 
+      <div class="section-label">Hai un suggerimento per Sweat?</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <div class="filter-card">
+          <textarea id="suggestionText" placeholder="Cosa miglioreresti o aggiungeresti?" style="min-height:70px;"></textarea>
+          <button class="primary-btn" style="margin-top:10px; padding:11px;" onclick="sendSuggestion()">Invia suggerimento</button>
+        </div>
+      </div>
+
       <div class="section-label">Ultime 18 settimane</div>
       <div class="heat-wrap"><div class="heat-grid" id="heatGrid"></div></div>
 
@@ -837,6 +998,9 @@
         </div>
       </div>
       <div id="adminSponsorsList"></div>
+
+      <div class="section-label">Suggerimenti dagli utenti</div>
+      <div id="adminSuggestionsList"><div class="live-row"><div class="txt">Nessun suggerimento ancora</div></div></div>
     </section>
 
   </main>
@@ -853,7 +1017,7 @@
 </div>
 
 <script>
-  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro"};
 
   // ================= NAVIGAZIONE =================
   function go(name){
@@ -889,6 +1053,8 @@
     if(name==='esplora') loadMarketplace();
     if(name==='messaggi') loadConversations();
     if(name==='admin') loadAdminData();
+    if(name==='ai') refreshProCards();
+    if(name==='aipro') loadProScreen();
     mainArea.scrollTo(0,0);
   }
 
@@ -976,6 +1142,7 @@
     document.getElementById("authNameRow").style.display = mode==="register" ? "block" : "none";
     document.getElementById("authTypeRow").style.display = mode==="register" ? "block" : "none";
     document.getElementById("forgotRow").style.display = mode==="register" ? "none" : "block";
+    document.getElementById("consentRow").style.display = mode==="register" ? "block" : "none";
     document.getElementById("authSubmitBtn").textContent = mode==="register" ? "Crea account" : "Accedi";
     document.getElementById("authError").classList.remove("show");
   }
@@ -1020,6 +1187,11 @@
     const name = document.getElementById("authName").value.trim();
     if(!email || !password){
       errBox.textContent = "Inserisci email e password.";
+      errBox.classList.add("show");
+      return;
+    }
+    if(authMode === "register" && !document.getElementById("authConsent").checked){
+      errBox.textContent = "Devi accettare Termini di Servizio e Privacy Policy per registrarti.";
       errBox.classList.add("show");
       return;
     }
@@ -1136,6 +1308,7 @@
         }
 
         loadWeeklyChallenge();
+        refreshProCards();
       }
     } catch(e){}
   }
@@ -1711,6 +1884,7 @@
       }
 
       loadAdminSponsors();
+      loadAdminSuggestions();
     } catch(e){}
   }
 
@@ -1878,7 +2052,32 @@
     document.getElementById('paneCibo').classList.toggle('active', tab==='cibo');
   }
 
+  let medicalCautionAcknowledged = false;
+  function confirmMedicalCautionIfNeeded(){
+    if(currentProfile && currentProfile.medical_conditions && !medicalCautionAcknowledged){
+      const ok = window.confirm("Hai indicato una condizione medica rilevante nel tuo profilo Pro. Scheda e piano alimentare generati automaticamente non la tengono in considerazione: parlane con il tuo medico prima di seguirli. Vuoi procedere comunque?");
+      if(!ok) return false;
+      medicalCautionAcknowledged = true;
+    }
+    return true;
+  }
+
+  function buildProContext(){
+    if(!currentProfile || !currentProfile.is_premium) return null;
+    const p = currentProfile;
+    const cal = calcCalorieTarget(p);
+    return {
+      age: p.age || null, heightCm: p.height_cm || null, weightKg: p.weight_kg || null, sex: p.sex || null,
+      primaryGoal: p.primary_goal || null, trainingTypes: p.training_types || [], equipmentAccess: p.equipment_access || null,
+      experienceLevel: p.experience_level || null, trainingConstraints: p.training_constraints || null,
+      foodLikes: p.food_likes || null, foodDislikes: p.food_dislikes || null, wantsVariety: p.wants_variety !== false,
+      calorieTarget: cal ? cal.target : null
+      // NB: medical_conditions e supplements NON vengono mai inclusi qui di proposito.
+    };
+  }
+
   async function generateScheda(){
+    if(!confirmMedicalCautionIfNeeded()) return;
     const box = document.getElementById("schedaResultBox");
     document.getElementById("schedaResult").style.display = "block";
 
@@ -1888,12 +2087,13 @@
     const goal = goalEl ? goalEl.textContent.trim() : "Tonificazione";
     const level = levelEl ? levelEl.textContent.trim() : "Intermedio";
     const days = daysEl ? daysEl.textContent.trim() : "3";
+    const pro = buildProContext();
 
     try {
       const res = await fetch("/api/generate-scheda", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: goal, level: level, days: days })
+        body: JSON.stringify({ goal: goal, level: level, days: days, pro: pro })
       });
       if(!res.ok) throw new Error("request_failed");
       const plan = await res.json();
@@ -1933,6 +2133,267 @@
       const anyActive = [...group.querySelectorAll('.chip')].some(c=>c.classList.contains('active'));
       if(!anyActive) group.querySelector('.chip').classList.add('active');
     }
+  }
+
+  function toggleMultiChip(el){
+    el.classList.toggle('active');
+  }
+
+  // ================= COACH AI PRO =================
+
+  function refreshProCards(){
+    const isPremium = !!(currentProfile && currentProfile.is_premium);
+    const promo = document.getElementById('proPromoCard');
+    const active = document.getElementById('proActiveCard');
+    if(promo) promo.style.display = isPremium ? 'none' : 'block';
+    if(active) active.style.display = isPremium ? 'block' : 'none';
+  }
+
+  async function activatePro(){
+    if(!currentUser){ toast('Devi accedere prima'); return; }
+    try {
+      await supabaseClient.from('profiles').update({ is_premium: true }).eq('id', currentUser.id);
+      if(currentProfile) currentProfile.is_premium = true;
+      toast('Coach AI Pro attivato (modalità demo)!');
+      loadProScreen();
+      refreshProCards();
+    } catch(e){ toast('Attivazione non riuscita, riprova'); }
+  }
+
+  function loadProScreen(){
+    const isPremium = !!(currentProfile && currentProfile.is_premium);
+    document.getElementById('proLockedBox').style.display = isPremium ? 'none' : 'block';
+    document.getElementById('proUnlockedBox').style.display = isPremium ? 'block' : 'none';
+    if(!isPremium) return;
+
+    const d = currentProfile || {};
+    if(d.age) document.getElementById('proAge').value = d.age;
+    if(d.height_cm) document.getElementById('proHeight').value = d.height_cm;
+    if(d.weight_kg) document.getElementById('proWeight').value = d.weight_kg;
+    setChipByVal('proSexChips', d.sex || 'uomo');
+    setChipByVal('proGoalChips', d.primary_goal || 'massa');
+    if(d.training_frequency) setChipByText('proFreqChips', d.training_frequency);
+    if(Array.isArray(d.training_types) && d.training_types.length){
+      document.querySelectorAll('#proTypeChips .chip').forEach(c => c.classList.toggle('active', d.training_types.includes(c.textContent.trim())));
+    }
+    setChipByVal('proEquipChips', d.equipment_access || 'palestra_completa');
+    setChipByVal('proLevelChips', d.experience_level || 'intermedio');
+    if(d.training_constraints) document.getElementById('proConstraints').value = d.training_constraints;
+    if(d.food_likes) document.getElementById('proFoodLikes').value = d.food_likes;
+    if(d.food_dislikes) document.getElementById('proFoodDislikes').value = d.food_dislikes;
+    document.getElementById('proVarietySwitch').classList.toggle('on', d.wants_variety !== false);
+    if(d.wake_time) document.getElementById('proWakeTime').value = d.wake_time;
+    setChipByVal('proWorkChips', d.work_mode || 'ufficio');
+    if(d.medical_conditions) document.getElementById('proMedical').value = d.medical_conditions;
+    if(d.supplements) document.getElementById('proSupplements').value = d.supplements;
+
+    loadWeightLogs();
+    loadPerformanceLogs();
+    showCalorieEstimate();
+  }
+
+  function setChipByVal(groupId, val){
+    document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.classList.toggle('active', c.getAttribute('data-val') === val));
+  }
+  function setChipByText(groupId, text){
+    document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.classList.toggle('active', c.textContent.trim() === text));
+  }
+
+  async function saveProProfile(){
+    const trainingTypes = [...document.querySelectorAll('#proTypeChips .chip.active')].map(c => c.textContent.trim());
+    const goalEl = document.querySelector('#proGoalChips .chip.active');
+    const sexEl = document.querySelector('#proSexChips .chip.active');
+    const freqEl = document.querySelector('#proFreqChips .chip.active');
+    const equipEl = document.querySelector('#proEquipChips .chip.active');
+    const levelEl = document.querySelector('#proLevelChips .chip.active');
+    const workEl = document.querySelector('#proWorkChips .chip.active');
+
+    const payload = {
+      age: parseInt(document.getElementById('proAge').value) || null,
+      height_cm: parseFloat((document.getElementById('proHeight').value || '').replace(',','.')) || null,
+      weight_kg: parseFloat((document.getElementById('proWeight').value || '').replace(',','.')) || null,
+      sex: sexEl ? sexEl.getAttribute('data-val') : 'uomo',
+      primary_goal: goalEl ? goalEl.getAttribute('data-val') : 'massa',
+      training_frequency: freqEl ? freqEl.textContent.trim() : '3',
+      training_types: trainingTypes,
+      equipment_access: equipEl ? equipEl.getAttribute('data-val') : 'palestra_completa',
+      experience_level: levelEl ? levelEl.getAttribute('data-val') : 'intermedio',
+      training_constraints: document.getElementById('proConstraints').value.trim() || null,
+      food_likes: document.getElementById('proFoodLikes').value.trim() || null,
+      food_dislikes: document.getElementById('proFoodDislikes').value.trim() || null,
+      wants_variety: document.getElementById('proVarietySwitch').classList.contains('on'),
+      wake_time: document.getElementById('proWakeTime').value || null,
+      work_mode: workEl ? workEl.getAttribute('data-val') : 'ufficio',
+      medical_conditions: document.getElementById('proMedical').value.trim() || null,
+      supplements: document.getElementById('proSupplements').value.trim() || null
+    };
+
+    try {
+      await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
+      Object.assign(currentProfile, payload);
+      toast('Profilo Pro salvato!');
+      showCalorieEstimate();
+    } catch(e){ toast('Salvataggio non riuscito, riprova'); }
+  }
+
+  function showCalorieEstimate(){
+    const box = document.getElementById('proCalorieResult');
+    const cal = calcCalorieTarget(currentProfile);
+    if(!cal){ box.style.display = 'none'; return; }
+    box.innerHTML = '<b>Fabbisogno stimato</b><span>Mantenimento ~' + cal.tdee + ' kcal/giorno · target per il tuo obiettivo ~' + cal.target + ' kcal/giorno</span>';
+    box.style.display = 'block';
+  }
+
+  // ---- Calcolo fabbisogno calorico (Mifflin-St Jeor), fatto in JS, mai dall'AI ----
+  function calcCalorieTarget(profile){
+    if(!profile.age || !profile.height_cm || !profile.weight_kg) return null;
+    let bmr;
+    if(profile.sex === 'donna'){
+      bmr = 10*profile.weight_kg + 6.25*profile.height_cm - 5*profile.age - 161;
+    } else {
+      bmr = 10*profile.weight_kg + 6.25*profile.height_cm - 5*profile.age + 5;
+    }
+    const freqNum = parseInt((profile.training_frequency || '3').replace('+','')) || 3;
+    let activityFactor = 1.2;
+    if(freqNum <= 1) activityFactor = 1.2;
+    else if(freqNum <= 3) activityFactor = 1.375;
+    else if(freqNum <= 4) activityFactor = 1.55;
+    else activityFactor = 1.725;
+    const tdee = bmr * activityFactor;
+    let target = tdee;
+    if(profile.primary_goal === 'massa') target = tdee + 350;
+    if(profile.primary_goal === 'definizione') target = tdee - 400;
+    return { bmr: Math.round(bmr), tdee: Math.round(tdee), target: Math.round(target) };
+  }
+
+  // ---- Monitoraggio peso ----
+  async function loadWeightLogs(){
+    try {
+      const { data } = await supabaseClient.from('weight_logs').select('*').eq('user_id', currentUser.id).order('log_date', { ascending: false }).limit(15);
+      renderWeightLogs(data || []);
+    } catch(e){}
+  }
+  function renderWeightLogs(rows){
+    const wrap = document.getElementById('weightLogList');
+    if(rows.length === 0){ wrap.innerHTML = '<div class="live-row"><div class="txt">Nessun peso registrato ancora</div></div>'; return; }
+    wrap.innerHTML = '';
+    rows.forEach(function(r){
+      const row = document.createElement('div'); row.className = 'log-row';
+      const left = document.createElement('div');
+      const d = document.createElement('div'); d.className = 'ld'; d.textContent = r.log_date;
+      const v = document.createElement('div'); v.className = 'lv'; v.textContent = r.weight_kg + ' kg';
+      left.appendChild(d); left.appendChild(v);
+      if(r.note){ const n = document.createElement('div'); n.className = 'ln'; n.textContent = r.note; left.appendChild(n); }
+      const btn = document.createElement('button'); btn.textContent = 'Elimina';
+      btn.onclick = function(){ deleteWeightLog(r.id); };
+      row.appendChild(left); row.appendChild(btn);
+      wrap.appendChild(row);
+    });
+  }
+  async function addWeightLog(){
+    const val = parseFloat((document.getElementById('weightLogValue').value || '').replace(',','.'));
+    const note = document.getElementById('weightLogNote').value.trim();
+    if(!val){ toast('Inserisci un peso valido'); return; }
+    try {
+      await supabaseClient.from('weight_logs').insert({ user_id: currentUser.id, weight_kg: val, note: note || null });
+      document.getElementById('weightLogValue').value = '';
+      document.getElementById('weightLogNote').value = '';
+      await supabaseClient.from('profiles').update({ weight_kg: val }).eq('id', currentUser.id);
+      if(currentProfile) currentProfile.weight_kg = val;
+      toast('Peso registrato!');
+      loadWeightLogs();
+    } catch(e){ toast('Registrazione non riuscita'); }
+  }
+  async function deleteWeightLog(id){
+    try { await supabaseClient.from('weight_logs').delete().eq('id', id); loadWeightLogs(); } catch(e){}
+  }
+
+  // ---- Monitoraggio performance ----
+  async function loadPerformanceLogs(){
+    try {
+      const { data } = await supabaseClient.from('performance_logs').select('*').eq('user_id', currentUser.id).order('log_date', { ascending: false }).limit(15);
+      renderPerformanceLogs(data || []);
+    } catch(e){}
+  }
+  function renderPerformanceLogs(rows){
+    const wrap = document.getElementById('performanceLogList');
+    if(rows.length === 0){ wrap.innerHTML = '<div class="live-row"><div class="txt">Nessuna performance registrata ancora</div></div>'; return; }
+    wrap.innerHTML = '';
+    rows.forEach(function(r){
+      const row = document.createElement('div'); row.className = 'log-row';
+      const left = document.createElement('div');
+      const d = document.createElement('div'); d.className = 'ld'; d.textContent = r.log_date + ' · ' + r.exercise;
+      const v = document.createElement('div'); v.className = 'lv';
+      v.textContent = (r.weight_kg ? r.weight_kg+'kg ' : '') + (r.sets ? r.sets+'x' : '') + (r.reps || '');
+      left.appendChild(d); left.appendChild(v);
+      const btn = document.createElement('button'); btn.textContent = 'Elimina';
+      btn.onclick = function(){ deletePerformanceLog(r.id); };
+      row.appendChild(left); row.appendChild(btn);
+      wrap.appendChild(row);
+    });
+  }
+  async function addPerformanceLog(){
+    const exercise = document.getElementById('perfExercise').value.trim();
+    const w = parseFloat((document.getElementById('perfWeight').value || '').replace(',','.')) || null;
+    const reps = parseInt(document.getElementById('perfReps').value) || null;
+    const sets = parseInt(document.getElementById('perfSets').value) || null;
+    if(!exercise){ toast('Scrivi almeno il nome dell\\'esercizio'); return; }
+    try {
+      await supabaseClient.from('performance_logs').insert({ user_id: currentUser.id, exercise: exercise, weight_kg: w, reps: reps, sets: sets });
+      document.getElementById('perfExercise').value = '';
+      document.getElementById('perfWeight').value = '';
+      document.getElementById('perfReps').value = '';
+      document.getElementById('perfSets').value = '';
+      toast('Performance registrata!');
+      loadPerformanceLogs();
+    } catch(e){ toast('Registrazione non riuscita'); }
+  }
+  async function deletePerformanceLog(id){
+    try { await supabaseClient.from('performance_logs').delete().eq('id', id); loadPerformanceLogs(); } catch(e){}
+  }
+
+  // ================= SUGGERIMENTI =================
+  async function sendSuggestion(){
+    const text = document.getElementById('suggestionText').value.trim();
+    if(!text){ toast('Scrivi prima il tuo suggerimento'); return; }
+    if(!currentUser){ toast('Devi accedere'); return; }
+    try {
+      await supabaseClient.from('suggestions').insert({
+        user_id: currentUser.id,
+        author_name: (currentProfile && currentProfile.name) || currentUser.email,
+        content: text
+      });
+      document.getElementById('suggestionText').value = '';
+      toast('Grazie! Suggerimento inviato.');
+    } catch(e){ toast('Invio non riuscito, riprova'); }
+  }
+
+  async function loadAdminSuggestions(){
+    try {
+      const { data } = await supabaseClient.from('suggestions').select('*').order('created_at', { ascending: false }).limit(50);
+      const wrap = document.getElementById('adminSuggestionsList');
+      wrap.innerHTML = '';
+      if(!data || data.length === 0){
+        wrap.innerHTML = '<div class="live-row"><div class="txt">Nessun suggerimento ancora</div></div>';
+        return;
+      }
+      data.forEach(function(s){
+        const row = document.createElement('div'); row.className = 'suggestion-row';
+        const p = document.createElement('div'); p.textContent = s.content;
+        const meta = document.createElement('div'); meta.className = 'sr-meta';
+        meta.textContent = (s.author_name || 'Utente') + (s.status === 'nuovo' ? ' · nuovo' : ' · letto');
+        row.appendChild(p); row.appendChild(meta);
+        if(s.status === 'nuovo'){
+          const btn = document.createElement('button'); btn.className = 'propose-btn'; btn.style.marginTop = '8px'; btn.textContent = 'Segna come letto';
+          btn.onclick = function(){ markSuggestionRead(s.id); };
+          row.appendChild(btn);
+        }
+        wrap.appendChild(row);
+      });
+    } catch(e){}
+  }
+  async function markSuggestionRead(id){
+    try { await supabaseClient.from('suggestions').update({ status: 'letto' }).eq('id', id); loadAdminSuggestions(); } catch(e){}
   }
 
   let lastDietPlan = null; // array di {day, colazione, pranzo, cena, spuntini} dopo una generazione riuscita
@@ -2002,13 +2463,15 @@
       toast('Rispondi prima alla domanda sulle analisi del sangue');
       return;
     }
+    if(!confirmMedicalCautionIfNeeded()) return;
     const allergies = [...document.getElementById('allergyChips').querySelectorAll('.chip.active')].map(c=>c.textContent.trim());
+    const pro = buildProContext();
 
     try {
       const res = await fetch("/api/generate-diet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hasAnalysis: aiAnalysisAnswer, allergies: allergies })
+        body: JSON.stringify({ hasAnalysis: aiAnalysisAnswer, allergies: allergies, pro: pro })
       });
       if(!res.ok) throw new Error("request_failed");
       const data = await res.json();
