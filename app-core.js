@@ -363,6 +363,29 @@
     } catch(e){ /* nessun post ancora, o tabelle non create: va bene */ }
   }
 
+  function formatRelativeTime(dateStr){
+    if(!dateStr) return "";
+    const then = new Date(dateStr).getTime();
+    const diffMin = Math.round((Date.now() - then) / 60000);
+    if(diffMin < 1) return "adesso";
+    if(diffMin < 60) return diffMin + " min fa";
+    const diffH = Math.round(diffMin / 60);
+    if(diffH < 24) return diffH + " h fa";
+    const diffD = Math.round(diffH / 24);
+    return diffD + " g fa";
+  }
+
+  function svgIcon(pathD, viewBox){
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS,"svg");
+    svg.setAttribute("viewBox", viewBox || "0 0 24 24");
+    svg.setAttribute("fill","none"); svg.setAttribute("stroke","currentColor"); svg.setAttribute("stroke-width","2");
+    const path = document.createElementNS(svgNS,"path");
+    path.setAttribute("d", pathD);
+    svg.appendChild(path);
+    return svg;
+  }
+
   function renderDynamicPosts(){
     const wrap = document.getElementById("dynamicPosts");
     if(!wrap) return;
@@ -372,11 +395,12 @@
       art.className = "post";
       art.dataset.postId = p.id;
 
+      // ---- header ----
       const head = document.createElement("div");
       head.className = "post-head";
       const av = document.createElement("div");
       av.className = "avatar a1";
-      av.style.width = "42px"; av.style.height = "42px"; av.style.cursor = "pointer";
+      av.style.width = "34px"; av.style.height = "34px"; av.style.fontSize = "13px"; av.style.cursor = "pointer";
       av.textContent = (p.author_name || "??").slice(0,2).toUpperCase();
       av.onclick = function(){ viewProfile(p.author_id); };
       const who = document.createElement("div");
@@ -384,48 +408,67 @@
       who.style.cursor = "pointer";
       who.onclick = function(){ viewProfile(p.author_id); };
       const nm = document.createElement("div"); nm.className = "name"; nm.textContent = p.author_name || "Utente Sweat";
-      const metaLine = [];
+      const metaLine = [p.type || "Allenamento"];
       if(p.distance_km) metaLine.push(Number(p.distance_km) + " km");
-      metaLine.push("Ora");
+      metaLine.push(formatRelativeTime(p.created_at));
       const meta = document.createElement("div"); meta.className = "meta"; meta.textContent = metaLine.join(" · ");
       who.appendChild(nm); who.appendChild(meta);
-      const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = p.type || "Allenamento";
-      head.appendChild(av); head.appendChild(who); head.appendChild(tag);
+      const menuBtn = document.createElement("button");
+      menuBtn.className = "post-menu-btn";
+      menuBtn.setAttribute("aria-label", "Altre opzioni");
+      const dotsNS = "http://www.w3.org/2000/svg";
+      const dotsSvg = document.createElementNS(dotsNS, "svg");
+      dotsSvg.setAttribute("viewBox","0 0 24 24"); dotsSvg.setAttribute("fill","currentColor");
+      [5,12,19].forEach(function(cy){
+        const c = document.createElementNS(dotsNS,"circle");
+        c.setAttribute("cx","12"); c.setAttribute("cy", cy); c.setAttribute("r","1.6");
+        dotsSvg.appendChild(c);
+      });
+      menuBtn.appendChild(dotsSvg);
+      menuBtn.onclick = function(){ reportPost(p.id); };
+      head.appendChild(av); head.appendChild(who); head.appendChild(menuBtn);
 
-      const cap = document.createElement("p");
-      cap.className = "caption";
-      cap.textContent = p.caption || "";
-
+      // ---- azioni (cuore / commento / condividi / salva) ----
       const actions = document.createElement("div");
-      actions.className = "actions";
+      actions.className = "post-actions";
       const kudos = document.createElement("button");
-      kudos.className = "action-btn kudos";
+      kudos.className = "kudos";
       if(p._likedByMe) kudos.classList.add("active");
       kudos.setAttribute("onclick", "toggleKudos(this)");
-      const svgNS = "http://www.w3.org/2000/svg";
-      const svg = document.createElementNS(svgNS,"svg");
-      svg.setAttribute("viewBox","0 0 24 24"); svg.setAttribute("fill","none");
-      svg.setAttribute("stroke","currentColor"); svg.setAttribute("stroke-width","2");
-      const path = document.createElementNS(svgNS,"path");
-      path.setAttribute("d","M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z");
-      svg.appendChild(path);
-      const countSpan = document.createElement("span");
-      countSpan.className = "count";
-      countSpan.textContent = p.likes_count || 0;
-      kudos.appendChild(svg);
-      kudos.appendChild(countSpan);
+      kudos.appendChild(svgIcon("M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"));
+      const commentBtn = document.createElement("button");
+      commentBtn.setAttribute("aria-label","Commenta");
+      commentBtn.appendChild(svgIcon("M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"));
+      const shareBtn = document.createElement("button");
+      shareBtn.setAttribute("aria-label","Condividi");
+      shareBtn.appendChild(svgIcon("M22 2 11 13M22 2 15 22l-4-9-9-4 20-7z"));
+      const spacer = document.createElement("div"); spacer.className = "spacer";
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "save-btn";
+      saveBtn.setAttribute("aria-label","Salva");
+      saveBtn.onclick = function(){ toggleSave(saveBtn); };
+      saveBtn.appendChild(svgIcon("M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"));
+      actions.appendChild(kudos); actions.appendChild(commentBtn); actions.appendChild(shareBtn);
+      actions.appendChild(spacer); actions.appendChild(saveBtn);
 
-      const reportBtn = document.createElement("button");
-      reportBtn.className = "action-btn";
-      reportBtn.style.marginLeft = "auto";
-      reportBtn.style.fontSize = "11px";
-      reportBtn.style.color = "var(--fog-dim)";
-      reportBtn.textContent = "Segnala";
-      reportBtn.onclick = function(){ reportPost(p.id); };
+      // ---- like / didascalia / orario ----
+      const likes = document.createElement("div");
+      likes.className = "post-likes";
+      const countSpan = document.createElement("span"); countSpan.className = "count"; countSpan.textContent = p.likes_count || 0;
+      likes.appendChild(countSpan);
+      likes.appendChild(document.createTextNode(" Mi piace"));
 
-      actions.appendChild(kudos);
-      actions.appendChild(reportBtn);
-      art.appendChild(head); art.appendChild(cap); art.appendChild(actions);
+      const capLine = document.createElement("div");
+      capLine.className = "post-caption-line";
+      const capName = document.createElement("b"); capName.textContent = p.author_name || "Utente Sweat";
+      capLine.appendChild(capName);
+      capLine.appendChild(document.createTextNode(p.caption || ""));
+
+      const timeLine = document.createElement("div");
+      timeLine.className = "post-time";
+      timeLine.textContent = formatRelativeTime(p.created_at);
+
+      art.appendChild(head); art.appendChild(actions); art.appendChild(likes); art.appendChild(capLine); art.appendChild(timeLine);
       wrap.appendChild(art);
     });
   }
@@ -526,7 +569,7 @@
       const { data: monthData } = await supabaseClient.from("posts").select("distance_km").eq("author_id", currentUser.id).gte("created_at", monthStart.toISOString());
       const monthKm = (monthData || []).reduce(function(sum, r){ return sum + (Number(r.distance_km) || 0); }, 0);
       const kmEl = document.getElementById("statKm");
-      if(kmEl) kmEl.textContent = Math.round(monthKm) + " km";
+      if(kmEl) kmEl.textContent = Math.round(monthKm);
     } catch(e){}
   }
 
@@ -720,13 +763,23 @@
         const row = document.createElement("div");
         row.className = "conv-row";
         row.onclick = function(){ openChat(pid, profilesById[pid] || "Utente Sweat"); go("chat"); };
-        const av = document.createElement("div"); av.className = "avatar a3"; av.style.width="44px"; av.style.height="44px";
+        const av = document.createElement("div"); av.className = "avatar a3";
         av.textContent = (profilesById[pid] || "??").slice(0,2).toUpperCase();
         const ci = document.createElement("div"); ci.className = "ci";
         const cn = document.createElement("div"); cn.className = "cn"; cn.textContent = profilesById[pid] || "Utente Sweat";
         const cp = document.createElement("div"); cp.className = "cp"; cp.textContent = m.content;
         ci.appendChild(cn); ci.appendChild(cp);
-        row.appendChild(av); row.appendChild(ci);
+
+        const right = document.createElement("div"); right.className = "cr-right";
+        const time = document.createElement("div"); time.className = "cr-time"; time.textContent = formatRelativeTime(m.created_at);
+        right.appendChild(time);
+        const unread = m.receiver_id === currentUser.id && m.read === false;
+        if(unread){
+          const dot = document.createElement("div"); dot.className = "cr-dot";
+          right.appendChild(dot);
+        }
+
+        row.appendChild(av); row.appendChild(ci); row.appendChild(right);
         wrap.appendChild(row);
       });
     } catch(e){}
@@ -818,20 +871,39 @@
       if(data && data.length){
         const s = data[0];
         wrap.innerHTML = "";
-        const banner = document.createElement("div"); banner.className = "sponsor-banner";
-        const content = document.createElement("div"); content.style.flex = "1";
-        const tag = document.createElement("div"); tag.className = "tagsp"; tag.textContent = "Sponsorizzato";
-        const b = document.createElement("b"); b.textContent = s.title;
-        const span = document.createElement("span"); span.textContent = s.description || "";
-        content.appendChild(tag); content.appendChild(b); content.appendChild(span);
-        banner.appendChild(content);
+
+        const art = document.createElement("article");
+        art.className = "post sponsor-post";
+
+        const head = document.createElement("div");
+        head.className = "post-head";
+        const av = document.createElement("div");
+        av.className = "avatar a4";
+        av.style.width = "34px"; av.style.height = "34px"; av.style.fontSize = "13px";
+        av.textContent = (s.title || "SP").slice(0,2).toUpperCase();
+        const who = document.createElement("div"); who.className = "who";
+        const nm = document.createElement("div"); nm.className = "name"; nm.textContent = s.title;
+        const meta = document.createElement("div"); meta.className = "meta sp-label"; meta.textContent = "Sponsorizzato";
+        who.appendChild(nm); who.appendChild(meta);
+        head.appendChild(av); head.appendChild(who);
+
+        const body = document.createElement("div");
+        body.className = "sponsor-body";
+        body.textContent = s.description || "";
+
+        art.appendChild(head); art.appendChild(body);
+
         if(s.link){
-          const link = document.createElement("a"); link.href = s.link; link.target = "_blank";
-          link.style.cssText = "color:var(--signal); font-size:12px; font-weight:700;";
-          link.textContent = "Scopri";
-          banner.appendChild(link);
+          const cta = document.createElement("a");
+          cta.className = "sponsor-cta"; cta.href = s.link; cta.target = "_blank";
+          cta.innerHTML = "";
+          const ctaText = document.createElement("span"); ctaText.textContent = "Scopri di più";
+          cta.appendChild(ctaText);
+          cta.appendChild(svgIcon("M9 18l6-6-6-6"));
+          art.appendChild(cta);
         }
-        wrap.appendChild(banner);
+
+        wrap.appendChild(art);
       } else {
         wrap.innerHTML = "";
       }
@@ -932,19 +1004,25 @@
 
   function toggleKudos(btn){
     btn.classList.toggle("active");
-    const c = btn.querySelector(".count");
-    let n = parseInt(c.textContent) || 0;
+    const art = btn.closest(".post");
+    const c = art ? art.querySelector(".post-likes .count") : null;
     const liked = btn.classList.contains("active");
-    c.textContent = liked ? n+1 : n-1;
+    if(c){
+      let n = parseInt(c.textContent) || 0;
+      c.textContent = liked ? n+1 : n-1;
+    }
 
-    const art = btn.closest("[data-post-id]");
-    if(!art || !supabaseClient || !currentUser) return;
-    const postId = art.dataset.postId;
+    const postId = art ? art.dataset.postId : null;
+    if(!postId || !supabaseClient || !currentUser) return;
     if(liked){
       supabaseClient.from("likes").insert({ post_id: postId, user_id: currentUser.id }).then(()=>{}).catch(()=>{});
     } else {
       supabaseClient.from("likes").delete().match({ post_id: postId, user_id: currentUser.id }).then(()=>{}).catch(()=>{});
     }
+  }
+
+  function toggleSave(btn){
+    btn.classList.toggle("saved");
   }
 
   // ================= RICERCA "CORRI CON ME" (demo, invariata) =================
