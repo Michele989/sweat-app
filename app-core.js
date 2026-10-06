@@ -1,8 +1,20 @@
 
-  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti", ricerca:"Cerca"};
 
   // ================= NAVIGAZIONE =================
+  let previousScreen = "feed";
+
+  function goBack(){
+    go(previousScreen || "feed");
+  }
+
   function go(name){
+    const currentActive = document.querySelector('.screen.active');
+    const currentName = currentActive ? currentActive.id.replace('screen-','') : null;
+    if(currentName && currentName !== name && currentName !== 'auth' && currentName !== 'onboarding'){
+      previousScreen = currentName;
+    }
+
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById('screen-'+name).classList.add('active');
 
@@ -20,15 +32,22 @@
       if(btn) btn.classList.add('active');
       const shareIcon = `<div class="icon-btn" onclick="shareApp()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/></svg></div>`;
       const addIcon = `<div class="icon-btn" onclick="go('crea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div>`;
+      const dmIcon = `<div class="icon-btn" onclick="go('messaggi')" aria-label="Messaggi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></div>`;
+      const searchIcon = `<div class="icon-btn" onclick="go('ricerca')" aria-label="Cerca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>`;
       if(name==='feed'){
-        topbar.innerHTML = `<div class="wordmark" onclick="go('home')"><span class="dot"></span>SWEAT</div><div class="head-actions"><div class="icon-btn has-dot" id="notifBellBtn" onclick="toggleNotif(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>${addIcon}${shareIcon}<div class="notif-panel" id="notifPanel"></div></div>`;
+        topbar.innerHTML = `<div class="wordmark" onclick="go('home')"><span class="dot"></span>SWEAT</div><div class="head-actions"><div class="icon-btn has-dot" id="notifBellBtn" onclick="toggleNotif(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>${searchIcon}${addIcon}${dmIcon}${shareIcon}<div class="notif-panel" id="notifPanel"></div></div>`;
         renderNotifPanel();
         loadFeedSponsor();
       } else {
         let customTitle = titles[name] || "";
         if(name==='chat' && currentChatPartner) customTitle = currentChatPartner.name;
         if(name==='altroprofilo' && currentOtherProfile) customTitle = currentOtherProfile.name;
-        topbar.innerHTML = `<div class="screen-title">${customTitle}</div><div class="head-actions">${shareIcon}</div>`;
+        if(name==='chat' || name==='commenti'){
+          const backBtn = `<button class="icon-btn" onclick="goBack()" aria-label="Indietro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>`;
+          topbar.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${backBtn}<div class="screen-title">${customTitle}</div></div><div class="head-actions">${shareIcon}</div>`;
+        } else {
+          topbar.innerHTML = `<div class="screen-title">${customTitle}</div><div class="head-actions">${shareIcon}</div>`;
+        }
       }
     }
     if(name==='gruppi') loadGroups();
@@ -292,6 +311,7 @@
         loadWeeklyChallenge();
         refreshProCards();
         loadMyPostsGrid();
+        loadAchievementsAndPRs();
       }
     } catch(e){}
   }
@@ -373,24 +393,90 @@
   // ================= FEED REALE =================
   let realPosts = [];
 
+  function showFeedSkeleton(){
+    const wrap = document.getElementById("dynamicPosts");
+    if(!wrap) return;
+    let html = "";
+    for(let i=0;i<2;i++){
+      html += '<div class="skeleton-post">'
+        + '<div class="skeleton-row"><div class="skeleton-box skeleton-avatar"></div><div class="skeleton-box skeleton-line" style="width:120px;"></div></div>'
+        + '<div class="skeleton-box skeleton-line" style="width:90%;height:13px;margin-bottom:8px;"></div>'
+        + '<div class="skeleton-box skeleton-line" style="width:55%;height:13px;"></div>'
+        + '</div>';
+    }
+    wrap.innerHTML = html;
+  }
+
   async function loadRealPosts(){
     if(!supabaseClient) return;
+    showFeedSkeleton();
     try {
-      const { data, error } = await supabaseClient
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
+      let authorIds = null;
+      if(currentUser){
+        const { data: followingRows } = await supabaseClient.from("follows").select("following_id").eq("follower_id", currentUser.id);
+        authorIds = (followingRows || []).map(function(r){ return r.following_id; });
+        authorIds.push(currentUser.id);
+      }
+      let query = supabaseClient.from("posts").select("*").order("created_at", { ascending: false }).limit(20);
+      if(authorIds && authorIds.length){ query = query.in("author_id", authorIds); }
+      const { data, error } = await query;
       if(error) throw error;
-      realPosts = data || [];
+      let posts = data || [];
+      if(authorIds && posts.length === 0){
+        // Non segui ancora nessuno (o chi segui non ha post): mostriamo gli ultimi post pubblici per scoprire persone
+        const { data: discover } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false }).limit(20);
+        posts = discover || [];
+      }
+      realPosts = posts;
       if(currentUser){
         const { data: myLikes } = await supabaseClient.from("likes").select("post_id").eq("user_id", currentUser.id);
         const likedIds = new Set((myLikes||[]).map(r=>r.post_id));
         realPosts.forEach(p => { p._likedByMe = likedIds.has(p.id); });
       }
       renderDynamicPosts();
-    } catch(e){ /* nessun post ancora, o tabelle non create: va bene */ }
+    } catch(e){
+      const wrap = document.getElementById("dynamicPosts");
+      if(wrap) wrap.innerHTML = "";
+    }
   }
+
+  // ---- Pull-to-refresh sul Feed ----
+  (function setupPullToRefresh(){
+    let startY = 0, pulling = false;
+    const threshold = 70;
+
+    function onTouchStart(e){
+      const feedScreen = document.getElementById("screen-feed");
+      if(!feedScreen || !feedScreen.classList.contains("active")) return;
+      if(document.getElementById("mainArea").scrollTop > 0) return;
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+    function onTouchMove(e){
+      if(!pulling) return;
+      const dy = e.touches[0].clientY - startY;
+      const indicator = document.getElementById("ptrIndicator");
+      if(dy > 10 && indicator){
+        indicator.classList.add("show");
+        indicator.textContent = dy > threshold ? "Rilascia per aggiornare" : "Tira per aggiornare";
+      }
+    }
+    function onTouchEnd(e){
+      if(!pulling) return;
+      pulling = false;
+      const indicator = document.getElementById("ptrIndicator");
+      const dy = (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
+      if(indicator) indicator.classList.remove("show");
+      if(dy > threshold){
+        if(indicator){ indicator.classList.add("show"); indicator.textContent = "Aggiornamento..."; }
+        loadRealPosts().then(function(){ if(indicator) indicator.classList.remove("show"); });
+      }
+    }
+
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchmove", onTouchMove, { passive: true });
+    document.addEventListener("touchend", onTouchEnd, { passive: true });
+  })();
 
   function formatRelativeTime(dateStr){
     if(!dateStr) return "";
@@ -454,7 +540,7 @@
         dotsSvg.appendChild(c);
       });
       menuBtn.appendChild(dotsSvg);
-      menuBtn.onclick = function(){ reportPost(p.id); };
+      menuBtn.onclick = function(){ handlePostMenu(p.id, currentUser && p.author_id === currentUser.id); };
       head.appendChild(av); head.appendChild(who); head.appendChild(menuBtn);
 
       // ---- azioni (cuore / commento / condividi / salva) ----
@@ -524,6 +610,8 @@
     const caption = (captionEl.value || "").trim() || "Allenamento completato 💪";
     const distRaw = (document.getElementById("creaDistance").value || "").replace(",", ".").trim();
     const distance = distRaw ? parseFloat(distRaw) : null;
+    const durRaw = (document.getElementById("creaDuration").value || "").replace(",", ".").trim();
+    const duration = durRaw ? parseFloat(durRaw) : null;
 
     if(!supabaseClient || !currentUser){
       toast("Devi accedere per pubblicare");
@@ -535,7 +623,8 @@
         author_name: (currentProfile && currentProfile.name) || currentUser.email,
         type: type,
         caption: caption,
-        distance_km: (distance && !isNaN(distance)) ? distance : null
+        distance_km: (distance && !isNaN(distance)) ? distance : null,
+        duration_min: (duration && !isNaN(duration)) ? duration : null
       }).select().single();
       if(error) throw error;
       data._likedByMe = false;
@@ -544,6 +633,7 @@
       bumpWorkoutCount();
       captionEl.value = "";
       document.getElementById("creaDistance").value = "";
+      document.getElementById("creaDuration").value = "";
       toast("Pubblicato nel feed di tutti!");
       go("feed");
     } catch(e){
@@ -684,6 +774,7 @@
   }
 
   async function leaveGroup(groupId){
+    if(!window.confirm("Vuoi davvero lasciare questo gruppo?")) return;
     try {
       await supabaseClient.from("group_members").delete().match({ group_id: groupId, user_id: currentUser.id });
       myGroupIds.delete(groupId);
@@ -756,6 +847,9 @@
       let meta = data.city || "";
       if(data.level) meta += (meta ? " · " : "") + data.level;
       document.getElementById("otherMeta").textContent = meta || "Atleta Sweat";
+      const onlineDot = document.getElementById("otherOnlineDot");
+      if(onlineDot) onlineDot.style.display = isRecentlyOnline(data.last_seen) ? "block" : "none";
+      refreshFollowButton(data.id);
       const bizWrap = document.getElementById("otherBizInfo");
       bizWrap.innerHTML = "";
       if(data.account_type && data.account_type !== "persona"){
@@ -792,9 +886,10 @@
       });
       const partnerIds = Object.keys(byPartner);
       let profilesById = {};
+      let lastSeenById = {};
       if(partnerIds.length){
-        const { data: profs } = await supabaseClient.from("profiles").select("id,name").in("id", partnerIds);
-        (profs || []).forEach(function(p){ profilesById[p.id] = p.name; });
+        const { data: profs } = await supabaseClient.from("profiles").select("id,name,last_seen").in("id", partnerIds);
+        (profs || []).forEach(function(p){ profilesById[p.id] = p.name; lastSeenById[p.id] = p.last_seen; });
       }
       const wrap = document.getElementById("conversationsList");
       wrap.innerHTML = "";
@@ -807,9 +902,15 @@
         const row = document.createElement("div");
         row.className = "conv-row";
         row.onclick = function(){ openChat(pid, profilesById[pid] || "Utente Sweat"); go("chat"); };
+        const avWrap = document.createElement("div"); avWrap.style.position = "relative"; avWrap.style.flexShrink = "0";
         const av = document.createElement("div"); av.className = "avatar a3";
         av.textContent = (profilesById[pid] || "??").slice(0,2).toUpperCase();
         av.onclick = function(e){ e.stopPropagation(); viewProfile(pid); };
+        avWrap.appendChild(av);
+        if(isRecentlyOnline(lastSeenById[pid])){
+          const dot = document.createElement("div"); dot.className = "online-dot";
+          avWrap.appendChild(dot);
+        }
         const ci = document.createElement("div"); ci.className = "ci";
         const cn = document.createElement("div"); cn.className = "cn"; cn.textContent = profilesById[pid] || "Utente Sweat";
         const cp = document.createElement("div"); cp.className = "cp"; cp.textContent = m.content;
@@ -907,6 +1008,13 @@
       line.appendChild(name); line.appendChild(text);
       const time = document.createElement("div"); time.className = "ctime"; time.textContent = formatRelativeTime(c.created_at);
       body.appendChild(line); body.appendChild(time);
+      if(currentUser && c.author_id === currentUser.id){
+        const delBtn = document.createElement("span");
+        delBtn.textContent = " · Elimina";
+        delBtn.style.cssText = "color:var(--fog-dim); cursor:pointer; font-size:10.5px;";
+        delBtn.onclick = function(){ deleteOwnComment(c.id, currentCommentsPostId); };
+        time.appendChild(delBtn);
+      }
       row.appendChild(av); row.appendChild(body);
       thread.appendChild(row);
     });
@@ -1047,6 +1155,7 @@
 
       loadAdminSponsors();
       loadAdminSuggestions();
+      loadAdminCharts();
     } catch(e){}
   }
 

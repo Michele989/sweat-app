@@ -161,12 +161,45 @@
   async function activatePro(){
     if(!currentUser){ toast('Devi accedere prima'); return; }
     try {
-      await supabaseClient.from('profiles').update({ is_premium: true }).eq('id', currentUser.id);
-      if(currentProfile) currentProfile.is_premium = true;
-      toast('Coach AI Pro attivato (modalità demo)!');
-      loadProScreen();
-      refreshProCards();
-    } catch(e){ toast('Attivazione non riuscita, riprova'); }
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.id, email: currentUser.email })
+      });
+      if(!res.ok) throw new Error('checkout_unavailable');
+      const data = await res.json();
+      if(data.url){
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error('no_url');
+    } catch(e){
+      // Stripe non ancora configurato: resta attivo il percorso demo, gratuito, per continuare a testare
+      try {
+        await supabaseClient.from('profiles').update({ is_premium: true }).eq('id', currentUser.id);
+        if(currentProfile) currentProfile.is_premium = true;
+        toast('Pagamento non configurato: attivato in modalità demo, gratuita');
+        loadProScreen();
+        refreshProCards();
+      } catch(e2){ toast('Attivazione non riuscita, riprova'); }
+    }
+  }
+
+  // Al ritorno da Stripe dopo un pagamento riuscito, il webhook ha già attivato Pro sul server:
+  // qui ricarichiamo solo il profilo per mostrarlo aggiornato.
+  function checkStripeReturn(){
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if(params.get('pro') === 'success'){
+        toast('Pagamento completato! Attivazione in corso...');
+        setTimeout(function(){ loadProfile(); }, 1500);
+      } else if(params.get('pro') === 'cancel'){
+        toast('Pagamento annullato');
+      }
+    } catch(e){}
+  }
+  if(typeof window !== 'undefined'){
+    window.addEventListener('load', checkStripeReturn);
   }
 
   function loadProScreen(){
@@ -314,6 +347,7 @@
     } catch(e){ toast('Registrazione non riuscita'); }
   }
   async function deleteWeightLog(id){
+    if(!window.confirm("Eliminare questa registrazione del peso?")) return;
     try { await supabaseClient.from('weight_logs').delete().eq('id', id); loadWeightLogs(); } catch(e){}
   }
 
@@ -358,6 +392,7 @@
     } catch(e){ toast('Registrazione non riuscita'); }
   }
   async function deletePerformanceLog(id){
+    if(!window.confirm("Eliminare questa registrazione?")) return;
     try { await supabaseClient.from('performance_logs').delete().eq('id', id); loadPerformanceLogs(); } catch(e){}
   }
 

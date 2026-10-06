@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070806">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ====== CONFIGURAZIONE — sostituisci questi due valori con quelli del tuo progetto Supabase ======
@@ -159,6 +161,7 @@
 
     <!-- ================= FEED ================= -->
     <section class="screen" id="screen-feed">
+      <div class="ptr-indicator" id="ptrIndicator">Aggiornamento...</div>
       <div id="feedSponsorBanner"></div>
 
       <div id="dynamicPosts"></div>
@@ -247,6 +250,7 @@
         </div>
         <span class="field-label">Racconta come è andata</span>
         <div class="field-row"><span class="field-label">Distanza in km (facoltativo, usata per sfide e classifica)</span><input type="text" id="creaDistance" placeholder="es. 8,4" inputmode="decimal"></div>
+        <div class="field-row"><span class="field-label">Durata in minuti (facoltativo, usata per i record personali)</span><input type="text" id="creaDuration" placeholder="es. 42,5" inputmode="decimal"></div>
         <textarea id="creaCaption" placeholder="Com'è andato l'allenamento di oggi?" style="margin-top:8px;"></textarea>
         <button class="primary-btn" onclick="publishWorkout()">Pubblica allenamento</button>
       </div>
@@ -596,16 +600,36 @@
         </div>
       </div>
 
+      <div class="section-label">Notifiche</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <button class="profile-btn" id="pushEnableBtn" style="width:100%;" onclick="enablePushNotifications()">Attiva notifiche push</button>
+      </div>
+
       <div class="section-label">Ultime 18 settimane</div>
       <div class="heat-wrap"><div class="heat-grid" id="heatGrid"></div></div>
 
-      <div class="section-label">Traguardi</div>
-      <div class="badge-grid">
-        <div class="badge"><span class="ic">🥇</span><span class="t">Prima mezza maratona</span></div>
-        <div class="badge"><span class="ic">🔥</span><span class="t">10 uscite di fila</span></div>
-        <div class="badge"><span class="ic">🌅</span><span class="t">5 allenamenti prima delle 7</span></div>
-        <div class="badge"><span class="ic">🤝</span><span class="t">Prima corsa in compagnia</span></div>
+      <div class="section-label">Record personali</div>
+      <div id="prList">
+        <div class="pr-row"><span>5 km</span><b>—</b></div>
+        <div class="pr-row"><span>10 km</span><b>—</b></div>
+        <div class="pr-row"><span>Mezza maratona</span><b>—</b></div>
       </div>
+
+      <div class="section-label">Traguardi</div>
+      <div class="badge-grid" id="badgeGrid">
+        <div class="badge locked" data-badge="prima-corsa"><span class="ic">🏃</span><span class="t">Prima corsa con distanza registrata</span></div>
+        <div class="badge locked" data-badge="dieci-allenamenti"><span class="ic">🔥</span><span class="t">10 allenamenti pubblicati</span></div>
+        <div class="badge locked" data-badge="gruppo"><span class="ic">👥</span><span class="t">Membro di un gruppo</span></div>
+        <div class="badge locked" data-badge="primo-like"><span class="ic">🤝</span><span class="t">Primo "Dai forza" ricevuto</span></div>
+      </div>
+    </section>
+
+    <!-- ================= RICERCA ================= -->
+    <section class="screen" id="screen-ricerca">
+      <div class="search-wrap" style="padding-bottom:4px;">
+        <input type="text" id="searchInput" placeholder="Cerca persone o gruppi..." oninput="runSearch(this.value)" style="margin-bottom:0;">
+      </div>
+      <div id="searchResults"></div>
     </section>
 
     <!-- ================= MESSAGGI ================= -->
@@ -635,13 +659,17 @@
     <section class="screen" id="screen-altroprofilo">
       <div class="profile-head">
         <div class="other-top-row">
-          <div class="avatar a2" id="otherAvatar">??</div>
+          <div style="position:relative;">
+            <div class="avatar a2" id="otherAvatar">??</div>
+            <div class="online-dot" id="otherOnlineDot" style="display:none;"></div>
+          </div>
           <div class="who">
             <h2 id="otherName">—</h2>
             <p id="otherMeta">—</p>
           </div>
         </div>
         <div class="profile-btn-row">
+          <button class="profile-btn" id="otherFollowBtn" onclick="toggleFollow()">Segui</button>
           <button class="profile-btn" id="otherMessageBtn" onclick="startChatWithOther()">Scrivi un messaggio</button>
         </div>
       </div>
@@ -654,6 +682,16 @@
         <div class="stat-box"><b id="adminUserCount">0</b><span>utenti</span></div>
         <div class="stat-box"><b id="adminPostCount">0</b><span>post</span></div>
         <div class="stat-box"><b id="adminReportCount">0</b><span>segnalazioni</span></div>
+      </div>
+
+      <div class="section-label">Crescita — ultimi 14 giorni</div>
+      <div class="filter-card" style="margin:0 20px 10px;">
+        <span class="field-label">Nuovi utenti al giorno</span>
+        <div id="chartUsers" class="admin-chart"></div>
+      </div>
+      <div class="filter-card" style="margin:0 20px 18px;">
+        <span class="field-label">Post pubblicati al giorno</span>
+        <div id="chartPosts" class="admin-chart"></div>
       </div>
 
       <div class="section-label">Segnalazioni</div>
@@ -688,6 +726,9 @@
 </div>
 
 <script src="app-core.js"></script>
+<script src="app-social.js"></script>
+<script src="app-admin-charts.js"></script>
 <script src="coach-ai.js"></script>
+<script src="app-push.js"></script>
 </body>
 </html>

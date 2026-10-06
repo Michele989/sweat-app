@@ -1,0 +1,9 @@
+{
+  "name": "Sweat",
+  "short_name": "Sweat",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#070806",
+  "theme_color": "#070806",
+  "icons": []
+}
