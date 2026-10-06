@@ -1,5 +1,5 @@
 
-  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti"};
 
   // ================= NAVIGAZIONE =================
   function go(name){
@@ -14,7 +14,7 @@
       topbar.classList.add('hidden'); tabbar.classList.add('hidden'); mainArea.classList.add('no-nav');
     } else {
       topbar.classList.remove('hidden'); mainArea.classList.remove('no-nav');
-      if(name==='chat'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
+      if(name==='chat' || name==='commenti'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       const btn = document.querySelector('.tab[data-tab="'+name+'"]');
       if(btn) btn.classList.add('active');
@@ -291,7 +291,36 @@
 
         loadWeeklyChallenge();
         refreshProCards();
+        loadMyPostsGrid();
       }
+    } catch(e){}
+  }
+
+  async function loadMyPostsGrid(){
+    const grid = document.getElementById("myPostsGrid");
+    if(!grid || !currentUser) return;
+    try {
+      const { data } = await supabaseClient.from("posts").select("*").eq("author_id", currentUser.id).order("created_at", { ascending: false }).limit(30);
+      grid.innerHTML = "";
+      if(!data || data.length === 0){
+        grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Non hai ancora pubblicato allenamenti</div></div>';
+        return;
+      }
+      const icons = { "Corsa":"🏃", "Palestra":"🏋️", "Ciclismo":"🚴", "Camminata":"🚶", "Trekking":"🥾" };
+      data.forEach(function(p){
+        const cell = document.createElement("div");
+        cell.className = "post-grid-cell";
+        cell.onclick = function(){ openComments(p.id); };
+        const ic = document.createElement("div"); ic.className = "pg-ic"; ic.textContent = icons[p.type] || "💪";
+        cell.appendChild(ic);
+        if(p.distance_km){
+          const val = document.createElement("div"); val.className = "pg-val"; val.textContent = Number(p.distance_km) + " km";
+          cell.appendChild(val);
+        }
+        const type = document.createElement("div"); type.className = "pg-type"; type.textContent = p.type || "Allenamento";
+        cell.appendChild(type);
+        grid.appendChild(cell);
+      });
     } catch(e){}
   }
 
@@ -438,6 +467,7 @@
       kudos.appendChild(svgIcon("M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"));
       const commentBtn = document.createElement("button");
       commentBtn.setAttribute("aria-label","Commenta");
+      commentBtn.onclick = function(){ openComments(p.id); };
       commentBtn.appendChild(svgIcon("M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"));
       const shareBtn = document.createElement("button");
       shareBtn.setAttribute("aria-label","Condividi");
@@ -464,11 +494,25 @@
       capLine.appendChild(capName);
       capLine.appendChild(document.createTextNode(p.caption || ""));
 
+      const commentsCount = p.comments_count || 0;
+      let commentsLink = null;
+      if(commentsCount > 0){
+        commentsLink = document.createElement("div");
+        commentsLink.className = "post-comments-link";
+        commentsLink.onclick = function(){ openComments(p.id); };
+        const ccount = document.createElement("span"); ccount.className = "ccount"; ccount.textContent = commentsCount;
+        commentsLink.appendChild(document.createTextNode("Visualizza tutti i "));
+        commentsLink.appendChild(ccount);
+        commentsLink.appendChild(document.createTextNode(" commenti"));
+      }
+
       const timeLine = document.createElement("div");
       timeLine.className = "post-time";
       timeLine.textContent = formatRelativeTime(p.created_at);
 
-      art.appendChild(head); art.appendChild(actions); art.appendChild(likes); art.appendChild(capLine); art.appendChild(timeLine);
+      art.appendChild(head); art.appendChild(actions); art.appendChild(likes); art.appendChild(capLine);
+      if(commentsLink) art.appendChild(commentsLink);
+      art.appendChild(timeLine);
       wrap.appendChild(art);
     });
   }
@@ -765,6 +809,7 @@
         row.onclick = function(){ openChat(pid, profilesById[pid] || "Utente Sweat"); go("chat"); };
         const av = document.createElement("div"); av.className = "avatar a3";
         av.textContent = (profilesById[pid] || "??").slice(0,2).toUpperCase();
+        av.onclick = function(e){ e.stopPropagation(); viewProfile(pid); };
         const ci = document.createElement("div"); ci.className = "ci";
         const cn = document.createElement("div"); cn.className = "cn"; cn.textContent = profilesById[pid] || "Utente Sweat";
         const cp = document.createElement("div"); cp.className = "cp"; cp.textContent = m.content;
@@ -818,6 +863,69 @@
       thread.appendChild(b);
       input.value = "";
     } catch(e){ toast("Messaggio non inviato, riprova"); }
+  }
+
+  // ================= COMMENTI REALI =================
+  let currentCommentsPostId = null;
+
+  async function openComments(postId){
+    if(!postId){ toast("È un post di esempio, non ha commenti reali"); return; }
+    if(!currentUser){ toast("Devi accedere per commentare"); return; }
+    currentCommentsPostId = postId;
+    go("commenti");
+    await loadComments(postId);
+  }
+
+  async function loadComments(postId){
+    const thread = document.getElementById("commentsThread");
+    thread.innerHTML = '<div class="live-row"><div class="txt">Caricamento...</div></div>';
+    try {
+      const { data } = await supabaseClient.from("comments").select("*").eq("post_id", postId).order("created_at", { ascending: true });
+      renderComments(data || []);
+    } catch(e){
+      thread.innerHTML = '<div class="live-row"><div class="txt">Impossibile caricare i commenti</div></div>';
+    }
+  }
+
+  function renderComments(rows){
+    const thread = document.getElementById("commentsThread");
+    thread.innerHTML = "";
+    if(rows.length === 0){
+      thread.innerHTML = '<div class="live-row"><div class="txt">Nessun commento ancora. Scrivi il primo!</div></div>';
+      return;
+    }
+    rows.forEach(function(c){
+      const row = document.createElement("div"); row.className = "comment-row";
+      const av = document.createElement("div"); av.className = "avatar a1";
+      av.style.cursor = "pointer";
+      av.onclick = function(){ viewProfile(c.author_id); };
+      av.textContent = (c.author_name || "??").slice(0,2).toUpperCase();
+      const body = document.createElement("div"); body.className = "cbody";
+      const line = document.createElement("div");
+      const name = document.createElement("span"); name.className = "cname"; name.textContent = c.author_name || "Utente Sweat";
+      const text = document.createElement("span"); text.className = "ctext"; text.textContent = c.content;
+      line.appendChild(name); line.appendChild(text);
+      const time = document.createElement("div"); time.className = "ctime"; time.textContent = formatRelativeTime(c.created_at);
+      body.appendChild(line); body.appendChild(time);
+      row.appendChild(av); row.appendChild(body);
+      thread.appendChild(row);
+    });
+  }
+
+  async function sendComment(){
+    const input = document.getElementById("commentInput");
+    const content = input.value.trim();
+    if(!content || !currentCommentsPostId || !currentUser) return;
+    try {
+      await supabaseClient.from("comments").insert({
+        post_id: currentCommentsPostId, author_id: currentUser.id,
+        author_name: (currentProfile && currentProfile.name) || currentUser.email, content: content
+      });
+      input.value = "";
+      await loadComments(currentCommentsPostId);
+      const countEl = document.querySelector('.post[data-post-id="' + currentCommentsPostId + '"] .post-comments-link .ccount');
+      if(countEl) countEl.textContent = (parseInt(countEl.textContent) || 0) + 1;
+    } catch(e){ toast("Commento non inviato, riprova"); }
   }
 
   // ================= NOTIFICHE REALI =================

@@ -181,13 +181,14 @@
         </div>
         <div class="post-actions">
           <button class="kudos" onclick="toggleKudos(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C0.7 8.4 2 4.5 6 4c2.1-.3 3.7.8 6 3 2.3-2.2 3.9-3.3 6-3 4 .5 5.3 4.4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg></button>
-          <button aria-label="Commenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"/><path d="M3 12.5a8.5 8.5 0 0 0 15 5"/></svg></button>
+          <button aria-label="Commenta" onclick="openComments(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1 4.5"/><path d="M3 12.5a8.5 8.5 0 0 0 15 5"/></svg></button>
           <button aria-label="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></button>
           <div class="spacer"></div>
           <button class="save-btn" onclick="toggleSave(this)" aria-label="Salva"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg></button>
         </div>
         <div class="post-likes"><span class="count">128</span> Mi piace</div>
         <div class="post-caption-line"><b>Marco Fusco</b>Alle 6 il lungomare è tutto per te. Test di ritmo in vista della mezza di ottobre 🎯</div>
+        <div class="post-comments-link" onclick="openComments(null)">Visualizza tutti i 14 commenti</div>
         <div class="post-time">2 ore fa</div>
       </article>
     </section>
@@ -537,6 +538,9 @@
         </div>
       </div>
 
+      <div class="section-label" style="padding-top:4px;">I tuoi allenamenti</div>
+      <div class="post-grid" id="myPostsGrid"></div>
+
       <div class="challenge-card">
         <div class="top-row"><b>Sfida della settimana</b><span id="challengeProgress">0/50 km</span></div>
         <div class="bar-bg"><div class="bar-fill" id="challengeBar" style="width:0%;"></div></div>
@@ -615,6 +619,15 @@
       <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
         <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." style="flex:1;">
         <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendChatMessage()">Invia</button>
+      </div>
+    </section>
+
+    <!-- ================= COMMENTI ================= -->
+    <section class="screen" id="screen-commenti">
+      <div id="commentsThread" style="padding:4px 0 16px;"></div>
+      <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
+        <input type="text" id="commentInput" placeholder="Scrivi un commento..." style="flex:1;">
+        <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendComment()">Invia</button>
       </div>
     </section>
 
