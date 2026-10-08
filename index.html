@@ -6,10 +6,12 @@
 <title>Sweat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#070806">
+<meta name="theme-color" content="#0A0B08">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ====== CONFIGURAZIONE — sostituisci questi due valori con quelli del tuo progetto Supabase ======
@@ -25,7 +27,7 @@
 <div class="shell">
 
   <header class="topbar hidden" id="topbar">
-    <div class="wordmark" id="feedHeader" onclick="go('home')"><span class="dot"></span>SWEAT</div>
+    <div class="wordmark brand-wordmark" id="feedHeader" onclick="go('home')"><svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgGradHdr" x1="20" y1="10" x2="80" y2="92" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7CF0A8"/><stop offset="55%" stop-color="#3FCB7E"/><stop offset="100%" stop-color="#1B9A56"/></linearGradient></defs><path fill="url(#lgGradHdr)" d="M50 9C50 9 23 46 23 66C23 83.6 35 92.5 50 92.5C65 92.5 77 83.6 77 66C77 46 50 9 50 9Z"/><path d="M28 63L41 63L47.5 46L57 82L64.5 63L73 63" fill="none" stroke="#0B130D" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm-text">SWEAT</span></div>
   </header>
 
   <main id="mainArea">
@@ -34,7 +36,7 @@
     <!-- ================= LOGIN / REGISTRAZIONE ================= -->
     <section class="screen active" id="screen-auth">
       <div class="home-head">
-        <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
+        <div class="wordmark brand-wordmark"><svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgGradHome1" x1="20" y1="10" x2="80" y2="92" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7CF0A8"/><stop offset="55%" stop-color="#3FCB7E"/><stop offset="100%" stop-color="#1B9A56"/></linearGradient></defs><path fill="url(#lgGradHome1)" d="M50 9C50 9 23 46 23 66C23 83.6 35 92.5 50 92.5C65 92.5 77 83.6 77 66C77 46 50 9 50 9Z"/><path d="M28 63L41 63L47.5 46L57 82L64.5 63L73 63" fill="none" stroke="#0B130D" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm-text">SWEAT</span></div>
       </div>
       <div class="search-wrap" style="padding-top:20px;">
         <div class="filter-card">
@@ -89,7 +91,7 @@
     <!-- ================= ONBOARDING ================= -->
     <section class="screen" id="screen-onboarding">
       <div class="home-head">
-        <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
+        <div class="wordmark brand-wordmark"><svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgGradHome2" x1="20" y1="10" x2="80" y2="92" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7CF0A8"/><stop offset="55%" stop-color="#3FCB7E"/><stop offset="100%" stop-color="#1B9A56"/></linearGradient></defs><path fill="url(#lgGradHome2)" d="M50 9C50 9 23 46 23 66C23 83.6 35 92.5 50 92.5C65 92.5 77 83.6 77 66C77 46 50 9 50 9Z"/><path d="M28 63L41 63L47.5 46L57 82L64.5 63L73 63" fill="none" stroke="#0B130D" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm-text">SWEAT</span></div>
       </div>
       <div class="search-wrap" style="padding-top:10px;">
         <h2 style="font-family:'Barlow Condensed'; font-size:26px; margin:0 0 6px;">Dove ti alleni?</h2>
@@ -105,7 +107,7 @@
 
     <section class="screen" id="screen-home">
       <div class="home-head">
-        <div class="wordmark hero-font" style="font-size:22px;"><span class="dot"></span>SWEAT</div>
+        <div class="wordmark brand-wordmark"><svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgGradHome3" x1="20" y1="10" x2="80" y2="92" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7CF0A8"/><stop offset="55%" stop-color="#3FCB7E"/><stop offset="100%" stop-color="#1B9A56"/></linearGradient></defs><path fill="url(#lgGradHome3)" d="M50 9C50 9 23 46 23 66C23 83.6 35 92.5 50 92.5C65 92.5 77 83.6 77 66C77 46 50 9 50 9Z"/><path d="M28 63L41 63L47.5 46L57 82L64.5 63L73 63" fill="none" stroke="#0B130D" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm-text">SWEAT</span></div>
         <div style="display:flex; gap:8px;">
           <button class="icon-btn" onclick="shareApp()" aria-label="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/></svg></button>
           <button class="cta-small" data-i18n="entra" onclick="go('feed')">Entra nell'app</button>
@@ -162,6 +164,7 @@
     <!-- ================= FEED ================= -->
     <section class="screen" id="screen-feed">
       <div class="ptr-indicator" id="ptrIndicator">Aggiornamento...</div>
+      <div class="stories-row" id="storiesRow"></div>
       <div id="feedSponsorBanner"></div>
 
       <div id="dynamicPosts"></div>
@@ -251,7 +254,37 @@
         <span class="field-label">Racconta come è andata</span>
         <div class="field-row"><span class="field-label">Distanza in km (facoltativo, usata per sfide e classifica)</span><input type="text" id="creaDistance" placeholder="es. 8,4" inputmode="decimal"></div>
         <div class="field-row"><span class="field-label">Durata in minuti (facoltativo, usata per i record personali)</span><input type="text" id="creaDuration" placeholder="es. 42,5" inputmode="decimal"></div>
+
+        <div id="creaRunFields">
+          <div class="field-row"><span class="field-label">Dislivello in metri (facoltativo)</span><input type="text" id="creaElevation" placeholder="es. 120" inputmode="decimal"></div>
+          <div class="field-row"><span class="field-label">Frequenza cardiaca media in bpm (facoltativo)</span><input type="text" id="creaHeartRate" placeholder="es. 152" inputmode="numeric"></div>
+        </div>
+
+        <div id="creaGymFields" style="display:none;">
+          <span class="field-label" style="margin-top:4px;">Esercizi</span>
+          <div id="creaExercisesList"></div>
+          <div style="display:flex; gap:8px; margin:8px 0 4px;">
+            <button class="profile-btn" style="flex:1;" onclick="addExerciseRow()">+ Aggiungi esercizio</button>
+            <button class="profile-btn" style="flex:1;" onclick="importExercisesFromAI()">🤖 Importa dalla scheda AI</button>
+          </div>
+        </div>
+
+        <div class="field-row"><span class="field-label">Sforzo percepito (1 = facile, 10 = massimale, facoltativo)</span>
+          <select id="creaEffort" style="width:100%; padding:12px 14px; background:var(--panel); border:1px solid var(--hairline); border-radius:10px; color:var(--paper); font-family:inherit; font-size:14px;">
+            <option value="">—</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+          </select>
+        </div>
+
         <textarea id="creaCaption" placeholder="Com'è andato l'allenamento di oggi?" style="margin-top:8px;"></textarea>
+        <span class="field-label" style="margin-top:10px;">Foto (facoltative, fino a 5)</span>
+        <div class="photo-picker-row" id="creaPhotoRow">
+          <label class="photo-picker-add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h3l2-3h4l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            <input type="file" id="creaPhotoInput" accept="image/*" multiple onchange="onCreaPhotosChosen(this)">
+          </label>
+        </div>
         <button class="primary-btn" onclick="publishWorkout()">Pubblica allenamento</button>
       </div>
     </section>
@@ -264,12 +297,12 @@
         <div id="proPromoCard" class="group-card" style="display:none;">
           <div class="g-title">Coach AI Pro — 4,99€/mese</div>
           <div class="g-sub">Scheda e piano alimentare calcolati sui tuoi dati reali (età, peso, altezza, obiettivo, allergie, livello) invece di stime generiche. Include monitoraggio di peso e performance nel tempo.</div>
-          <button class="primary-btn" style="padding:11px;" onclick="go('aipro')">Scopri Coach AI Pro</button>
+          <button class="primary-btn pro-btn" style="padding:11px;" onclick="go('aipro')">Scopri Coach AI Pro</button>
         </div>
-        <div id="proActiveCard" class="group-card" style="display:none; background:linear-gradient(135deg, rgba(87,225,59,0.18), rgba(87,225,59,0.03));">
+        <div id="proActiveCard" class="group-card" style="display:none; background:linear-gradient(135deg, rgba(242,184,75,0.18), rgba(242,184,75,0.03));">
           <div class="g-title">✓ Coach AI Pro attivo</div>
           <div class="g-sub">Scheda e piano alimentare personalizzati sui tuoi dati reali.</div>
-          <button class="primary-btn" style="padding:11px;" onclick="go('aipro')">Gestisci profilo Pro e monitoraggio</button>
+          <button class="primary-btn pro-btn" style="padding:11px;" onclick="go('aipro')">Gestisci profilo Pro e monitoraggio</button>
         </div>
 
         <div id="aiUploadStep">
@@ -401,7 +434,7 @@
             <p style="font-family:'Barlow Condensed'; font-size:26px; font-weight:800; margin:0 0 8px;">Coach AI Pro</p>
             <p style="font-size:14px; color:var(--fog); margin:0 0 4px;">4,99€ / mese</p>
             <p style="font-size:13px; color:#DADEE3; line-height:1.6; margin:16px 0;">Scheda e piano alimentare calcolati sul tuo fabbisogno calorico reale (formula di Mifflin-St Jeor), su misura per età, peso, altezza, obiettivo, livello e allergie — non più stime generiche. Include il monitoraggio di peso e performance nel tempo, con la cronologia sempre a disposizione.</p>
-            <button class="primary-btn" style="padding:14px;" onclick="activatePro()">Sblocca Coach AI Pro</button>
+            <button class="primary-btn pro-btn" style="padding:14px;" onclick="activatePro()">Sblocca Coach AI Pro</button>
             <p class="ai-disclaimer" style="margin-top:12px;">Il pagamento reale non è ancora attivo: per ora l'attivazione è in modalità dimostrativa, gratuita, mentre completiamo l'integrazione dei pagamenti.</p>
           </div>
         </div>
@@ -524,7 +557,13 @@
     <section class="screen" id="screen-profilo">
       <div class="profile-head">
         <div class="profile-top-row">
-          <div class="avatar a1" id="profileAvatar">MC</div>
+          <div class="avatar-wrap">
+            <div class="avatar a1" id="profileAvatar">MC</div>
+            <label class="avatar-edit-btn" aria-label="Cambia foto profilo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h3l2-3h4l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+              <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatarPhoto(this)">
+            </label>
+          </div>
           <div class="profile-stats">
             <div class="pstat"><b id="statWorkouts">0</b><span>allenamenti</span></div>
             <div class="pstat"><b id="statKm">0</b><span>km mese</span></div>
@@ -542,14 +581,26 @@
         </div>
       </div>
 
-      <div class="section-label" style="padding-top:4px;">I tuoi allenamenti</div>
+      <div id="profileChecklistBox"></div>
+
+      <div class="section-label" style="padding-top:4px; display:flex; justify-content:space-between; align-items:center;">
+        <span>I tuoi allenamenti</span>
+        <button class="profile-btn" style="padding:6px 12px; font-size:12px;" onclick="go('progresso')">📈 Progressi</button>
+      </div>
       <div class="post-grid" id="myPostsGrid"></div>
 
       <div class="challenge-card">
         <div class="top-row"><b>Sfida della settimana</b><span id="challengeProgress">0/50 km</span></div>
         <div class="bar-bg"><div class="bar-fill" id="challengeBar" style="width:0%;"></div></div>
+        <div class="lb-scope-row">
+          <button class="lb-scope-btn active" id="lbScopeGlobale" onclick="setLeaderboardScope('globale')">Globale</button>
+          <button class="lb-scope-btn" id="lbScopeAmici" onclick="setLeaderboardScope('amici')">Amici</button>
+        </div>
         <div id="leaderboardList"><div class="rank-row"><span>Pubblica un allenamento per entrare in classifica</span></div></div>
       </div>
+
+      <div class="section-label">Sfide 1 contro 1</div>
+      <div id="challenge1v1Box" class="filter-card" style="margin:0 20px 18px;"></div>
 
       <div class="points-card">
         <div><div class="num" id="pointsNum">0</div><div class="lbl">Punti Sweat</div></div>
@@ -622,14 +673,65 @@
         <div class="badge locked" data-badge="gruppo"><span class="ic">👥</span><span class="t">Membro di un gruppo</span></div>
         <div class="badge locked" data-badge="primo-like"><span class="ic">🤝</span><span class="t">Primo "Dai forza" ricevuto</span></div>
       </div>
+
+      <div class="section-label">Persone bloccate</div>
+      <div id="blockedUsersList" style="padding:0 20px 10px;"><p style="font-size:12.5px;color:var(--fog);margin:0;">Nessuno è bloccato</p></div>
+
+      <div class="section-label">Zona pericolosa</div>
+      <div class="search-wrap" style="padding-top:0; padding-bottom:30px;">
+        <div class="filter-card" style="border-color:var(--alert);">
+          <p style="font-size:12.5px; color:var(--fog); margin:0 0 12px;">Cancella definitivamente il tuo account e tutti i tuoi dati (post, foto, messaggi, follower). Non si può annullare.</p>
+          <button class="profile-btn" style="width:100%; color:var(--alert); border-color:var(--alert);" onclick="deleteMyAccount()">Elimina il mio account</button>
+        </div>
+      </div>
     </section>
 
     <!-- ================= RICERCA ================= -->
     <section class="screen" id="screen-ricerca">
-      <div class="search-wrap" style="padding-bottom:4px;">
-        <input type="text" id="searchInput" placeholder="Cerca persone o gruppi..." oninput="runSearch(this.value)" style="margin-bottom:0;">
+      <div class="lb-scope-row" style="margin:12px 20px 0;">
+        <button class="lb-scope-btn active" id="searchModePersone" onclick="setSearchMode('persone')">Persone</button>
+        <button class="lb-scope-btn" id="searchModePopolari" onclick="setSearchMode('popolari')">Popolari</button>
       </div>
-      <div id="searchResults"></div>
+
+      <div id="paneSearchPersone">
+        <div class="search-wrap" style="padding-bottom:4px;">
+          <input type="text" id="searchInput" placeholder="Cerca persone o gruppi..." oninput="runSearch(this.value)" style="margin-bottom:0;">
+        </div>
+        <div id="searchResults"></div>
+        <div id="peopleYouMayKnow"></div>
+      </div>
+
+      <div id="paneSearchPopolari" style="display:none;">
+        <div class="search-wrap" style="padding-bottom:4px;">
+          <input type="text" id="hashtagInput" placeholder="Cerca per hashtag (es. corsa)..." oninput="runHashtagSearch(this.value)" style="margin-bottom:0;">
+        </div>
+        <div class="post-grid" id="exploreGrid" style="padding:4px 20px 20px;"></div>
+      </div>
+    </section>
+
+    <!-- ================= AGGIORNAMENTI DI PROGRESSO (MENSILI) ================= -->
+    <section class="screen" id="screen-progresso">
+      <div class="search-wrap" style="padding-bottom:4px;">
+        <div class="filter-card">
+          <p style="font-size:12.5px; color:var(--fog); margin:0 0 12px;">Racconta i tuoi miglioramenti, fisici o in palestra: foto, peso, percentuale di grasso corporeo e qualche nota. Un buon ritmo è una volta al mese.</p>
+          <span class="field-label">Foto (facoltative, fino a 4)</span>
+          <div class="photo-picker-row" id="progressPhotoRow">
+            <label class="photo-picker-add">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h3l2-3h4l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+              <input type="file" id="progressPhotoInput" accept="image/*" multiple onchange="onProgressPhotosChosen(this)">
+            </label>
+          </div>
+          <div class="field-row" style="display:flex; gap:10px;">
+            <input type="text" id="progressWeight" placeholder="Peso (kg, facoltativo)" inputmode="decimal" style="flex:1;">
+            <input type="text" id="progressBodyFat" placeholder="% grasso (facoltativo)" inputmode="decimal" style="flex:1;">
+          </div>
+          <textarea id="progressNotes" placeholder="Come procede? Cosa è cambiato questo mese?" style="min-height:70px; margin-top:8px;"></textarea>
+          <button class="primary-btn" style="margin-top:10px; padding:12px;" onclick="publishProgressUpdate()">Pubblica aggiornamento</button>
+        </div>
+      </div>
+
+      <div class="section-label">Il tuo percorso</div>
+      <div id="progressTimeline" style="padding:0 20px 24px;"></div>
     </section>
 
     <!-- ================= MESSAGGI ================= -->
@@ -640,9 +742,26 @@
 
     <section class="screen" id="screen-chat">
       <div id="chatThread" style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;"></div>
-      <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
+      <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:8px; align-items:center; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
+        <label class="chat-attach-btn" aria-label="Allega foto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15V8a2 2 0 0 0-2-2H8L5 9H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><circle cx="15" cy="13" r="3.5"/></svg>
+          <input type="file" id="chatImageInput" accept="image/*" style="display:none;" onchange="sendChatImage(this)">
+        </label>
         <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." style="flex:1;">
         <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendChatMessage()">Invia</button>
+      </div>
+    </section>
+
+    <!-- ================= CHAT DI GRUPPO ================= -->
+    <section class="screen" id="screen-gruppochat">
+      <div id="groupChatThread" style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;"></div>
+      <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:8px; align-items:center; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
+        <label class="chat-attach-btn" aria-label="Allega foto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15V8a2 2 0 0 0-2-2H8L5 9H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><circle cx="15" cy="13" r="3.5"/></svg>
+          <input type="file" id="groupChatImageInput" accept="image/*" style="display:none;" onchange="sendGroupChatImage(this)">
+        </label>
+        <input type="text" id="groupChatInput" placeholder="Scrivi al gruppo..." style="flex:1;">
+        <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendGroupChatMessage()">Invia</button>
       </div>
     </section>
 
@@ -671,6 +790,8 @@
         <div class="profile-btn-row">
           <button class="profile-btn" id="otherFollowBtn" onclick="toggleFollow()">Segui</button>
           <button class="profile-btn" id="otherMessageBtn" onclick="startChatWithOther()">Scrivi un messaggio</button>
+          <button class="profile-btn" id="otherChallengeBtn" onclick="proposeChallengeToOther()">Sfidalo 1v1</button>
+          <button class="profile-btn" id="otherBlockBtn" style="color:var(--alert); border-color:var(--alert);" onclick="toggleBlockOther()">Blocca</button>
         </div>
       </div>
       <div id="otherBizInfo"></div>
@@ -727,6 +848,13 @@
 
 <script src="app-core.js"></script>
 <script src="app-social.js"></script>
+<script src="app-photos.js"></script>
+<script src="app-stories.js"></script>
+<script src="app-workout.js"></script>
+<script src="app-safety.js"></script>
+<script src="app-groupchat.js"></script>
+<script src="app-explore.js"></script>
+<script src="app-progress.js"></script>
 <script src="app-admin-charts.js"></script>
 <script src="coach-ai.js"></script>
 <script src="app-push.js"></script>
