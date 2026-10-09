@@ -7,13 +7,19 @@ let selectedProgressPhotos = [];
 
 function onProgressPhotosChosen(input){
   const files = Array.prototype.slice.call(input.files || []);
+  if(files.length === 0){ return; } // utente ha annullato la selezione
+  let addedAny = false;
+  let rejectedForType = false;
   files.forEach(function(f){
     if(selectedProgressPhotos.length >= 4) return;
-    if(!f.type || f.type.indexOf("image/") !== 0) return;
+    if(!f.type || f.type.indexOf("image/") !== 0){ rejectedForType = true; return; }
     selectedProgressPhotos.push(f);
+    addedAny = true;
   });
   input.value = "";
   renderProgressPhotoPreviews();
+  if(!addedAny && rejectedForType){ toast("Scegli una o più immagini"); }
+  else if(!addedAny){ toast("Hai già raggiunto il massimo di 4 foto"); }
 }
 
 function removeProgressPhoto(idx){
@@ -89,7 +95,8 @@ async function publishProgressUpdate(){
     toast("Aggiornamento pubblicato!");
     prependProgressTimelineItem(data);
   } catch(e){
-    toast("Pubblicazione non riuscita, riprova");
+    console.error("Pubblicazione aggiornamento di progresso non riuscita:", e);
+    toast("Pubblicazione non riuscita: " + (e && e.message ? e.message : "riprova"));
   }
 }
 

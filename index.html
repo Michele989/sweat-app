@@ -165,6 +165,7 @@
     <section class="screen" id="screen-feed">
       <div class="ptr-indicator" id="ptrIndicator">Aggiornamento...</div>
       <div class="stories-row" id="storiesRow"></div>
+      <input type="file" id="feedSwipeCameraInput" accept="image/*,video/*" style="display:none;" onchange="uploadStoryPhoto(this)">
       <div id="feedSponsorBanner"></div>
 
       <div id="dynamicPosts"></div>
@@ -310,7 +311,7 @@
             <span class="ic">📷</span>
             <b>Scatta o carica una foto</b>
             <span>Usata solo per questa analisi, non viene pubblicata</span>
-            <input type="file" id="aiPhotoInput" accept="image/*" capture="environment" onchange="handleAiPhoto(event)">
+            <input type="file" id="aiPhotoInput" accept="image/*" onchange="handleAiPhoto(event)">
           </label>
         </div>
 

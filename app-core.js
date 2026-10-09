@@ -819,7 +819,8 @@
       toast("Pubblicato nel feed di tutti!");
       go("feed");
     } catch(e){
-      toast("Pubblicazione non riuscita, riprova");
+      console.error("Pubblicazione allenamento non riuscita:", e);
+      toast("Pubblicazione non riuscita: " + (e && e.message ? e.message : "riprova"));
     }
   }
 
@@ -1615,3 +1616,38 @@
     if(runFields) runFields.style.display = isGym ? 'none' : '';
     if(gymFields) gymFields.style.display = isGym ? '' : 'none';
   }
+
+  // ================= GESTO SWIPE NEL FEED: apre la fotocamera (stile Instagram) =================
+  // Uno swipe orizzontale deciso, fatto sullo sfondo del feed (non sulle
+  // foto/caroselli dei post, né su bottoni o altri controlli), apre la
+  // scelta foto/video che pubblica direttamente come storia.
+  function openFeedCamera(){
+    const input = document.getElementById('feedSwipeCameraInput');
+    if(input) input.click();
+  }
+
+  (function(){
+    let swipeStartX = 0, swipeStartY = 0, swipeStartTime = 0, swipeTracking = false;
+    function isExcludedFromSwipe(target){
+      return !!(target.closest && target.closest('.photo-carousel, .post-photo, .stories-row, button, a, input, textarea, select, .reaction-picker, .share-menu'));
+    }
+    document.addEventListener('touchstart', function(e){
+      const feedScreen = document.getElementById('screen-feed');
+      if(!feedScreen || !feedScreen.classList.contains('active')){ swipeTracking = false; return; }
+      if(isExcludedFromSwipe(e.target)){ swipeTracking = false; return; }
+      const t = e.touches[0];
+      swipeStartX = t.clientX; swipeStartY = t.clientY; swipeStartTime = Date.now();
+      swipeTracking = true;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e){
+      if(!swipeTracking) return;
+      swipeTracking = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - swipeStartX;
+      const dy = t.clientY - swipeStartY;
+      const dt = Date.now() - swipeStartTime;
+      if(dt < 600 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6){
+        openFeedCamera();
+      }
+    }, { passive: true });
+  })();
