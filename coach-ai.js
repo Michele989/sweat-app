@@ -85,9 +85,34 @@
     };
   }
 
+  let lastSchedaPlan = null; // array di {day, title, detail} dopo una generazione riuscita (o demo)
+
+  function renderSchedaDays(plan){
+    const box = document.getElementById("schedaResultBox");
+    box.innerHTML = "";
+    plan.forEach(function(item){
+      const row = document.createElement("div");
+      row.className = "plan-day";
+      const d = document.createElement("div"); d.className = "d"; d.textContent = item.day || "-";
+      const info = document.createElement("div"); info.className = "info";
+      const b = document.createElement("b"); b.textContent = item.title || "Allenamento";
+      const span = document.createElement("span"); span.textContent = item.detail || "";
+      info.appendChild(b); info.appendChild(span);
+      row.appendChild(d); row.appendChild(info);
+      box.appendChild(row);
+    });
+  }
+
+  function buildFallbackSchedaPlan(){
+    return [
+      { day: "LUN", title: "Full body — forza", detail: "Squat 4x8 · Panca 4x8 · Rematore 3x10 · Plank 3x40s" },
+      { day: "MER", title: "Cardio + core", detail: "30 min a intervalli (1' forte/1' recupero) · Crunch 3x20 · Russian twist 3x20" },
+      { day: "VEN", title: "Full body — tonificazione", detail: "Affondi 3x12 · Spinte manubri 3x12 · Trazioni assistite 3x8 · Hip thrust 3x15" }
+    ];
+  }
+
   async function generateScheda(){
     if(!confirmMedicalCautionIfNeeded()) return;
-    const box = document.getElementById("schedaResultBox");
     document.getElementById("schedaResult").style.display = "block";
 
     const goalEl = document.querySelector("#schedaGoalChips .chip.active");
@@ -107,20 +132,15 @@
       if(!res.ok) throw new Error("request_failed");
       const plan = await res.json();
       if(Array.isArray(plan) && plan.length){
-        box.innerHTML = "";
-        plan.forEach(function(item){
-          const row = document.createElement("div");
-          row.className = "plan-day";
-          const d = document.createElement("div"); d.className = "d"; d.textContent = item.day || "-";
-          const info = document.createElement("div"); info.className = "info";
-          const b = document.createElement("b"); b.textContent = item.title || "Allenamento";
-          const span = document.createElement("span"); span.textContent = item.detail || "";
-          info.appendChild(b); info.appendChild(span);
-          row.appendChild(d); row.appendChild(info);
-          box.appendChild(row);
-        });
+        lastSchedaPlan = plan;
+        renderSchedaDays(plan);
+      } else {
+        throw new Error("formato_inatteso");
       }
-    } catch(e){ /* resta il piano demo statico già nel markup */ }
+    } catch(e){
+      lastSchedaPlan = buildFallbackSchedaPlan();
+      renderSchedaDays(lastSchedaPlan);
+    }
   }
 
   function selectAnalysis(el, value){
@@ -530,6 +550,39 @@
       renderDietDays(lastDietPlan);
     }
     document.getElementById('dietResult').style.display = 'block';
+  }
+
+  // ---- Copia il piano generato dal Coach AI dentro "La mia scheda" / "Alimentazione" ----
+  // (editabili e persistenti, a differenza di questo che è generato al volo).
+  function useGeneratedSchedaAsBase(){
+    if(!lastSchedaPlan || !lastSchedaPlan.length){ toast("Genera prima una scheda"); return; }
+    const parsed = lastSchedaPlan.map(function(item){
+      const detail = item.detail || "";
+      const exercises = detail.split("·").map(function(piece){
+        const t = piece.trim();
+        if(!t) return null;
+        const match = t.match(/^(.*?)\s*(\d+)\s*[x×]\s*(\d+)/i);
+        if(match) return { name: (match[1].trim() || t), sets: parseInt(match[2],10), reps: parseInt(match[3],10), weight_kg: null };
+        return { name: t, sets: null, reps: null, weight_kg: null };
+      }).filter(Boolean);
+      return { day: (item.day || "").toUpperCase().slice(0,3), title: item.title || "", exercises: exercises };
+    });
+    if(typeof window.importTrainingPlanDays === "function"){
+      window.importTrainingPlanDays(parsed);
+      toast("Scheda copiata in \"La mia scheda\"");
+    } else {
+      toast("Vai su \"La mia scheda\" e poi riprova");
+    }
+  }
+
+  function useGeneratedDietAsBase(){
+    if(!lastDietPlan || !lastDietPlan.length){ toast("Genera prima un piano alimentare"); return; }
+    if(typeof window.importDietPlanDays === "function"){
+      window.importDietPlanDays(lastDietPlan, null);
+      toast("Piano alimentare copiato in \"Alimentazione\"");
+    } else {
+      toast("Vai su \"Alimentazione\" e poi riprova");
+    }
   }
 
   function downloadPlan(kind){

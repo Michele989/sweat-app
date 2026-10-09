@@ -375,7 +375,10 @@
                 <div class="plan-day"><div class="d">VEN</div><div class="info"><b>Full body — tonificazione</b><span>Affondi 3x12 · Spinte manubri 3x12 · Trazioni assistite 3x8 · Hip thrust 3x15</span></div></div>
               </div>
               <div class="ai-disclaimer">Scheda generata automaticamente a scopo dimostrativo. Prima di iniziare un nuovo programma di allenamento, fatti valutare da un personal trainer o da un medico dello sport.</div>
-              <button class="propose-btn" style="margin-top:4px;" onclick="downloadPlan('scheda')">Scarica scheda (.txt)</button>
+              <div style="display:flex; gap:8px;">
+                <button class="propose-btn" style="margin-top:4px; flex:1;" onclick="downloadPlan('scheda')">Scarica (.txt)</button>
+                <button class="propose-btn" style="margin-top:4px; flex:1;" onclick="useGeneratedSchedaAsBase()">Usa come base per "La mia scheda"</button>
+              </div>
             </div>
           </div>
 
@@ -419,7 +422,10 @@
                 </div>
               </div>
               <div class="ai-disclaimer">Piano generato automaticamente a scopo dimostrativo e informativo: non sostituisce il parere di un medico o di un nutrizionista abilitato, soprattutto in presenza di patologie, allergie o intolleranze.</div>
-              <button class="propose-btn" style="margin-top:4px;" onclick="downloadPlan('cibo')">Scarica piano (.txt)</button>
+              <div style="display:flex; gap:8px;">
+                <button class="propose-btn" style="margin-top:4px; flex:1;" onclick="downloadPlan('cibo')">Scarica (.txt)</button>
+                <button class="propose-btn" style="margin-top:4px; flex:1;" onclick="useGeneratedDietAsBase()">Usa come base per "Alimentazione"</button>
+              </div>
             </div>
           </div>
         </div>
@@ -588,6 +594,11 @@
         <button class="profile-btn" style="padding:6px 12px; font-size:12px;" onclick="go('progresso')">📈 Progressi</button>
       </div>
       <div class="post-grid" id="myPostsGrid"></div>
+
+      <div style="display:flex; gap:10px; margin:4px 20px 18px;">
+        <button class="profile-btn" style="flex:1;" onclick="go('scheda')">📋 La mia scheda</button>
+        <button class="profile-btn" style="flex:1;" onclick="go('dieta')">🍽️ Alimentazione</button>
+      </div>
 
       <div class="challenge-card">
         <div class="top-row"><b>Sfida della settimana</b><span id="challengeProgress">0/50 km</span></div>
@@ -758,6 +769,59 @@
       <div id="progressTimeline" style="padding:0 20px 24px;"></div>
     </section>
 
+    <!-- ================= LA MIA SCHEDA ================= -->
+    <section class="screen" id="screen-scheda">
+      <div class="search-wrap" style="padding-bottom:4px;">
+        <p style="font-size:13px; color:var(--fog); margin:0 0 14px;">Il tuo piano settimanale, sempre modificabile. Aggiorna i kg quando sali di peso: qui resta il piano fisso, mentre qui sotto trovi lo storico reale calcolato dagli allenamenti che pubblichi.</p>
+        <div class="filter-card" style="margin-bottom:16px;">
+          <span class="field-label">Hai già una scheda in PDF (dal tuo personal trainer)?</span>
+          <label class="profile-btn" style="display:block; text-align:center; cursor:pointer; margin-top:8px;">
+            📄 Importa da PDF
+            <input type="file" accept="application/pdf" style="display:none;" onchange="importSchedaFromPdf(this)">
+          </label>
+        </div>
+      </div>
+      <div class="section-label">Piano settimanale</div>
+      <div id="schedaDaysBox" style="padding:0 20px 8px; display:flex; flex-direction:column; gap:14px;"></div>
+      <div style="padding:4px 20px 24px;">
+        <button class="primary-btn" onclick="saveTrainingPlan()">Salva scheda</button>
+      </div>
+      <div class="section-label">Progressione pesi (dai tuoi allenamenti pubblicati)</div>
+      <div id="weightProgressionBox" style="padding:0 20px 28px;"></div>
+    </section>
+
+    <!-- ================= ALIMENTAZIONE ================= -->
+    <section class="screen" id="screen-dieta">
+      <div class="search-wrap" style="padding-bottom:4px;">
+        <p style="font-size:13px; color:var(--fog); margin:0 0 14px;">Il tuo piano alimentare, sempre modificabile, più un diario per segnare cosa mangi davvero ogni giorno.</p>
+        <div class="filter-card" style="margin-bottom:16px;">
+          <span class="field-label">Hai già un piano in PDF (dal tuo nutrizionista)?</span>
+          <label class="profile-btn" style="display:block; text-align:center; cursor:pointer; margin-top:8px;">
+            📄 Importa da PDF
+            <input type="file" accept="application/pdf" style="display:none;" onchange="importDietFromPdf(this)">
+          </label>
+          <div class="field-row" style="margin-top:12px;"><span class="field-label">Obiettivo calorico giornaliero (facoltativo)</span><input type="text" id="dietCalorieTarget" placeholder="es. 2200" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="section-label">Piano settimanale</div>
+      <div id="dietDaysBox" style="padding:0 20px 8px; display:flex; flex-direction:column; gap:14px;"></div>
+      <div style="padding:4px 20px 24px;">
+        <button class="primary-btn" onclick="saveDietPlan()">Salva piano alimentare</button>
+      </div>
+      <div class="section-label">Diario pasti</div>
+      <div class="filter-card" style="margin:0 20px 14px;">
+        <div class="chips" id="mealLogTypeChips">
+          <div class="chip active" onclick="chipSelect(this)">Colazione</div>
+          <div class="chip" onclick="chipSelect(this)">Pranzo</div>
+          <div class="chip" onclick="chipSelect(this)">Cena</div>
+          <div class="chip" onclick="chipSelect(this)">Spuntino</div>
+        </div>
+        <textarea id="mealLogDescription" placeholder="Cosa hai mangiato?" style="min-height:56px;"></textarea>
+        <button class="propose-btn" style="margin-top:8px;" onclick="addMealLog()">Aggiungi al diario</button>
+      </div>
+      <div id="mealLogList" style="padding:0 20px 28px;"></div>
+    </section>
+
     <!-- ================= MESSAGGI ================= -->
     <section class="screen" id="screen-messaggi">
       <div class="results-head"><h3>Conversazioni</h3></div>
@@ -876,6 +940,8 @@
 <script src="app-photos.js"></script>
 <script src="app-stories.js"></script>
 <script src="app-workout.js"></script>
+<script src="app-training-plan.js"></script>
+<script src="app-diet-plan.js"></script>
 <script src="app-safety.js"></script>
 <script src="app-groupchat.js"></script>
 <script src="app-explore.js"></script>

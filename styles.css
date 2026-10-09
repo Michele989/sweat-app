@@ -407,6 +407,11 @@
   .plan-day .d{width:38px; font-family:'Barlow Condensed'; font-weight:700; font-size:14px; color:var(--signal); flex-shrink:0;}
   .plan-day .info b{display:block; font-size:13.5px;}
   .plan-day .info span{font-size:11.5px; color:var(--fog);}
+  .plan-day-edit{background:var(--panel); border:1px solid var(--hairline); border-radius:var(--radius-lg); padding:14px 16px;}
+  .plan-day-edit-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .plan-day-edit-head b{font-family:'Barlow Condensed'; font-weight:700; font-size:14px; color:var(--signal); width:36px; flex-shrink:0;}
+  .plan-day-edit-head .plan-day-title{flex:1; background:var(--ink); border:1px solid var(--hairline); border-radius:8px; color:var(--paper); font-family:inherit; font-size:13px; padding:9px 10px;}
+  .plan-day-exercises .exercise-row:last-child{margin-bottom:0;}
   .result-box{background:var(--panel); border:1px solid var(--hairline); border-radius:16px; overflow:hidden; margin-bottom:6px;}
   .meal-block{padding:14px 16px; border-bottom:1px solid var(--hairline);}
   .meal-block:last-child{border-bottom:none;}

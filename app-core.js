@@ -1,5 +1,5 @@
 
-  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti", ricerca:"Cerca", gruppochat:"Chat di gruppo", scopri:"Scopri", progresso:"Aggiornamento di progresso", impostazioni:"Impostazioni", salvati:"Post salvati", archivio:"Archivio allenamenti"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti", ricerca:"Cerca", gruppochat:"Chat di gruppo", scopri:"Scopri", progresso:"Aggiornamento di progresso", impostazioni:"Impostazioni", salvati:"Post salvati", archivio:"Archivio allenamenti", scheda:"La mia scheda", dieta:"Alimentazione"};
 
   function setVerifiedBadge(nameEl, verified){
     if(!nameEl) return;
@@ -46,7 +46,7 @@
       topbar.classList.add('hidden'); tabbar.classList.add('hidden'); mainArea.classList.add('no-nav');
     } else {
       topbar.classList.remove('hidden'); mainArea.classList.remove('no-nav');
-      if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
+      if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio' || name==='scheda' || name==='dieta'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       const btn = document.querySelector('.tab[data-tab="'+name+'"]');
       if(btn) btn.classList.add('active');
@@ -66,7 +66,7 @@
         if(name==='gruppochat' && currentGroupChat) customTitle = currentGroupChat.name;
         if(name==='altroprofilo' && currentOtherProfile) customTitle = currentOtherProfile.name;
         const settingsIcon = `<div class="icon-btn" onclick="go('impostazioni')" aria-label="Impostazioni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg></div>`;
-        if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio'){
+        if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio' || name==='scheda' || name==='dieta'){
           const backBtn = `<button class="icon-btn" onclick="goBack()" aria-label="Indietro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>`;
           topbar.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${backBtn}<div class="screen-title">${customTitle}</div></div><div class="head-actions">${shareIcon}</div>`;
         } else if(name==='profilo'){
@@ -88,6 +88,8 @@
     if(name==='salvati' && typeof loadSavedPosts === 'function') loadSavedPosts();
     if(name==='archivio' && typeof loadArchivedPosts === 'function') loadArchivedPosts();
     if(name==='progresso' && typeof loadProgressUpdates === 'function') loadProgressUpdates();
+    if(name==='scheda' && typeof loadTrainingPlan === 'function') loadTrainingPlan();
+    if(name==='dieta' && typeof loadDietPlan === 'function') loadDietPlan();
     mainArea.scrollTo(0,0);
   }
 
@@ -441,14 +443,30 @@
   }
 
   // ================= MAPPA ATTIVITÀ REALE ("Ultime 18 settimane") =================
-  // Calcola quante volte ti sei allenato in ciascuno degli ultimi 126 giorni
-  // (18 blocchi da 7 giorni) a partire dai post reali, invece di colori casuali.
+  // Calcola, per ciascuno degli ultimi 126 giorni (18 blocchi da 7 giorni),
+  // un punteggio di intensità a partire dai post reali: non solo QUANTI
+  // allenamenti, ma anche QUANTO intensi (sforzo percepito + volume/durata),
+  // invece di colori casuali o del solo conteggio.
   const HEAT_SHADES = ['#1B1F19','#233318','#3B5A1E','#4E9A2A','#57E13B'];
-  function heatShadeFor(count){
-    if(!count) return HEAT_SHADES[0];
-    if(count === 1) return HEAT_SHADES[2];
-    if(count === 2) return HEAT_SHADES[3];
+  function heatShadeFor(score){
+    if(!score) return HEAT_SHADES[0];
+    if(score < 1) return HEAT_SHADES[1];
+    if(score < 2) return HEAT_SHADES[2];
+    if(score < 3.5) return HEAT_SHADES[3];
     return HEAT_SHADES[4];
+  }
+  // Un allenamento "medio" (sforzo 5/10, 30 minuti, nessun esercizio
+  // specificato) vale circa 1 punto; sforzo e volume più alti pesano di più.
+  function dayIntensityScore(dayPosts){
+    let total = 0;
+    dayPosts.forEach(function(p){
+      const effortFactor = (p.perceived_effort || 5) / 5; // 1-10 -> 0.2-2
+      const durationFactor = Math.min(2, (p.duration_min || 30) / 30); // minuti -> 0-2
+      const exerciseFactor = (p.exercises && p.exercises.length) ? Math.min(1.5, p.exercises.length / 4) : 0;
+      const volumeFactor = Math.max(durationFactor, exerciseFactor);
+      total += (effortFactor * 0.5) + (volumeFactor * 0.5);
+    });
+    return total;
   }
   function renderEmptyHeatmap(heat){
     heat.innerHTML = "";
@@ -464,12 +482,12 @@
     try {
       const totalDays = 18 * 7;
       const since = new Date(); since.setHours(0,0,0,0); since.setDate(since.getDate() - (totalDays - 1));
-      const { data } = await supabaseClient.from("posts").select("created_at").eq("author_id", currentUser.id).eq("archived", false).gte("created_at", since.toISOString());
-      const counts = {};
+      const { data } = await supabaseClient.from("posts").select("created_at,perceived_effort,duration_min,exercises").eq("author_id", currentUser.id).eq("archived", false).gte("created_at", since.toISOString());
+      const byDay = {};
       (data || []).forEach(function(p){
         const d = new Date(p.created_at);
         const key = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
-        counts[key] = (counts[key] || 0) + 1;
+        (byDay[key] = byDay[key] || []).push(p);
       });
       heat.innerHTML = "";
       // 7 righe (giorno all'interno del blocco settimanale) x 18 colonne (blocco, dal più vecchio al più recente)
@@ -479,8 +497,10 @@
           const cellDate = new Date(since);
           cellDate.setDate(since.getDate() + dayIndex);
           const key = cellDate.getFullYear() + "-" + (cellDate.getMonth()+1) + "-" + cellDate.getDate();
-          const cell = document.createElement("div"); cell.className = "heat-cell"; cell.style.background = heatShadeFor(counts[key]);
-          cell.title = cellDate.toLocaleDateString("it-IT") + (counts[key] ? (": " + counts[key] + " allenamento/i") : "");
+          const dayPosts = byDay[key] || [];
+          const score = dayIntensityScore(dayPosts);
+          const cell = document.createElement("div"); cell.className = "heat-cell"; cell.style.background = heatShadeFor(score);
+          cell.title = cellDate.toLocaleDateString("it-IT") + (dayPosts.length ? (": " + dayPosts.length + " allenamento/i") : "");
           heat.appendChild(cell);
         }
       }
@@ -874,6 +894,20 @@
       realPosts.unshift(data);
       renderDynamicPosts();
       bumpWorkoutCount();
+      // Alimenta automaticamente lo storico pesi/performance (vedi "La mia
+      // scheda" -> Progressione pesi) con gli esercizi appena pubblicati,
+      // senza bisogno di re-inserirli a mano in Coach AI Pro.
+      if(exercises && exercises.length){
+        Promise.all(exercises.map(function(ex){
+          return supabaseClient.from("performance_logs").insert({
+            user_id: currentUser.id,
+            exercise: ex.name,
+            weight_kg: ex.weight_kg,
+            reps: ex.reps,
+            sets: ex.sets
+          });
+        })).catch(function(e){ console.error("Registrazione automatica performance non riuscita:", e); });
+      }
       captionEl.value = "";
       document.getElementById("creaDistance").value = "";
       document.getElementById("creaDuration").value = "";
