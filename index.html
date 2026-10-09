@@ -578,7 +578,6 @@
         <div class="profile-btn-row">
           <button class="profile-btn" data-i18n="messaggi" onclick="go('messaggi')">Messaggi</button>
           <button class="profile-btn" id="adminLinkBtn" data-i18n="admin" style="display:none;" onclick="go('admin')">Pannello Admin</button>
-          <button class="profile-btn" data-i18n="esci" onclick="handleLogout()">Esci</button>
         </div>
       </div>
 
@@ -617,12 +616,31 @@
         </div>
       </div>
 
-      <div class="section-label">Lingua / Language</div>
+      <div class="section-label">Ultime 18 settimane</div>
+      <div class="heat-wrap"><div class="heat-grid" id="heatGrid"></div></div>
+
+      <div class="section-label">Record personali</div>
+      <div id="prList">
+        <div class="pr-row"><span>5 km</span><b>—</b></div>
+        <div class="pr-row"><span>10 km</span><b>—</b></div>
+        <div class="pr-row"><span>Mezza maratona</span><b>—</b></div>
+      </div>
+
+      <div class="section-label" style="padding-bottom:20px;">Traguardi</div>
+      <div class="badge-grid" id="badgeGrid" style="margin-bottom:24px;">
+        <div class="badge locked" data-badge="prima-corsa"><span class="ic">🏃</span><span class="t">Prima corsa con distanza registrata</span></div>
+        <div class="badge locked" data-badge="dieci-allenamenti"><span class="ic">🔥</span><span class="t">10 allenamenti pubblicati</span></div>
+        <div class="badge locked" data-badge="gruppo"><span class="ic">👥</span><span class="t">Membro di un gruppo</span></div>
+        <div class="badge locked" data-badge="primo-like"><span class="ic">🤝</span><span class="t">Primo "Dai forza" ricevuto</span></div>
+      </div>
+    </section>
+
+    <!-- ================= IMPOSTAZIONI ================= -->
+    <section class="screen" id="screen-impostazioni">
+      <div class="section-label" style="padding-top:4px;">I tuoi contenuti</div>
       <div class="search-wrap" style="padding-top:0;">
-        <div class="chips">
-          <div class="chip active" id="langChipIt" onclick="setLanguage('it')">Italiano</div>
-          <div class="chip" id="langChipEn" onclick="setLanguage('en')">English</div>
-        </div>
+        <button class="profile-btn" style="width:100%; margin-bottom:8px; text-align:left;" onclick="go('salvati')">🔖 Post salvati</button>
+        <button class="profile-btn" style="width:100%; text-align:left;" onclick="go('archivio')">🗄️ Archivio allenamenti</button>
       </div>
 
       <div id="accountSection" style="display:none;">
@@ -644,6 +662,19 @@
         </div>
       </div>
 
+      <div class="section-label">Notifiche</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <button class="profile-btn" id="pushEnableBtn" style="width:100%;" onclick="enablePushNotifications()">Attiva notifiche push</button>
+      </div>
+
+      <div class="section-label">Lingua / Language</div>
+      <div class="search-wrap" style="padding-top:0;">
+        <div class="chips">
+          <div class="chip active" id="langChipIt" onclick="setLanguage('it')">Italiano</div>
+          <div class="chip" id="langChipEn" onclick="setLanguage('en')">English</div>
+        </div>
+      </div>
+
       <div class="section-label">Hai un suggerimento per Sweat?</div>
       <div class="search-wrap" style="padding-top:0;">
         <div class="filter-card">
@@ -652,31 +683,12 @@
         </div>
       </div>
 
-      <div class="section-label">Notifiche</div>
-      <div class="search-wrap" style="padding-top:0;">
-        <button class="profile-btn" id="pushEnableBtn" style="width:100%;" onclick="enablePushNotifications()">Attiva notifiche push</button>
-      </div>
-
-      <div class="section-label">Ultime 18 settimane</div>
-      <div class="heat-wrap"><div class="heat-grid" id="heatGrid"></div></div>
-
-      <div class="section-label">Record personali</div>
-      <div id="prList">
-        <div class="pr-row"><span>5 km</span><b>—</b></div>
-        <div class="pr-row"><span>10 km</span><b>—</b></div>
-        <div class="pr-row"><span>Mezza maratona</span><b>—</b></div>
-      </div>
-
-      <div class="section-label">Traguardi</div>
-      <div class="badge-grid" id="badgeGrid">
-        <div class="badge locked" data-badge="prima-corsa"><span class="ic">🏃</span><span class="t">Prima corsa con distanza registrata</span></div>
-        <div class="badge locked" data-badge="dieci-allenamenti"><span class="ic">🔥</span><span class="t">10 allenamenti pubblicati</span></div>
-        <div class="badge locked" data-badge="gruppo"><span class="ic">👥</span><span class="t">Membro di un gruppo</span></div>
-        <div class="badge locked" data-badge="primo-like"><span class="ic">🤝</span><span class="t">Primo "Dai forza" ricevuto</span></div>
-      </div>
-
       <div class="section-label">Persone bloccate</div>
       <div id="blockedUsersList" style="padding:0 20px 10px;"><p style="font-size:12.5px;color:var(--fog);margin:0;">Nessuno è bloccato</p></div>
+
+      <div class="search-wrap" style="padding-top:10px;">
+        <button class="profile-btn" style="width:100%;" data-i18n="esci" onclick="handleLogout()">Esci dall'account</button>
+      </div>
 
       <div class="section-label">Zona pericolosa</div>
       <div class="search-wrap" style="padding-top:0; padding-bottom:30px;">
@@ -685,6 +697,17 @@
           <button class="profile-btn" style="width:100%; color:var(--alert); border-color:var(--alert);" onclick="deleteMyAccount()">Elimina il mio account</button>
         </div>
       </div>
+    </section>
+
+    <!-- ================= POST SALVATI ================= -->
+    <section class="screen" id="screen-salvati">
+      <div class="post-grid" id="savedPostsGrid" style="margin-top:4px;"></div>
+    </section>
+
+    <!-- ================= ARCHIVIO ALLENAMENTI ================= -->
+    <section class="screen" id="screen-archivio">
+      <p style="font-size:12.5px; color:var(--fog); margin:10px 20px;">I post archiviati non compaiono nel feed né sul tuo profilo pubblico, ma restano qui. Tocca un allenamento per ripristinarlo.</p>
+      <div class="post-grid" id="archivedPostsGrid"></div>
     </section>
 
     <!-- ================= RICERCA ================= -->
@@ -743,12 +766,13 @@
 
     <section class="screen" id="screen-chat">
       <div id="chatThread" style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;"></div>
+      <div id="chatTypingIndicator" class="typing-indicator" style="display:none;">sta scrivendo...</div>
       <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:440px; display:flex; gap:8px; align-items:center; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--ink); border-top:1px solid var(--hairline);">
         <label class="chat-attach-btn" aria-label="Allega foto">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15V8a2 2 0 0 0-2-2H8L5 9H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><circle cx="15" cy="13" r="3.5"/></svg>
           <input type="file" id="chatImageInput" accept="image/*" style="display:none;" onchange="sendChatImage(this)">
         </label>
-        <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." style="flex:1;">
+        <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." style="flex:1;" oninput="handleChatTyping()">
         <button class="primary-btn" style="width:auto; padding:12px 20px;" onclick="sendChatMessage()">Invia</button>
       </div>
     </section>

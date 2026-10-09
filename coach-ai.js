@@ -565,15 +565,5 @@
     URL.revokeObjectURL(url);
   }
 
-  // ================= HEATMAP PROFILO (decorativa) =================
-  const heat = document.getElementById('heatGrid');
-  const shades = ['#1B1F19','#233318','#3B5A1E','#4E9A2A','#57E13B'];
-  for(let i=0;i<18*7;i++){
-    const cell = document.createElement('div'); cell.className='heat-cell';
-    const lvl = Math.random(); let color = shades[0];
-    if(lvl>0.85) color = shades[4]; else if(lvl>0.65) color = shades[3]; else if(lvl>0.45) color = shades[2]; else if(lvl>0.25) color = shades[1];
-    cell.style.background = color; heat.appendChild(cell);
-  }
-
   // ================= AVVIO =================
   initApp();

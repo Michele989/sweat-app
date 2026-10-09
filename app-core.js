@@ -1,5 +1,5 @@
 
-  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti", ricerca:"Cerca", gruppochat:"Chat di gruppo", scopri:"Scopri", progresso:"Aggiornamento di progresso"};
+  const titles = {gruppi:"Gruppi", esplora:"Marketplace", crea:"Nuovo allenamento", profilo:"Profilo", ai:"Coach AI", messaggi:"Messaggi", chat:"Messaggio", altroprofilo:"Profilo", admin:"Pannello Admin", aipro:"Coach AI Pro", commenti:"Commenti", ricerca:"Cerca", gruppochat:"Chat di gruppo", scopri:"Scopri", progresso:"Aggiornamento di progresso", impostazioni:"Impostazioni", salvati:"Post salvati", archivio:"Archivio allenamenti"};
 
   function setVerifiedBadge(nameEl, verified){
     if(!nameEl) return;
@@ -46,7 +46,7 @@
       topbar.classList.add('hidden'); tabbar.classList.add('hidden'); mainArea.classList.add('no-nav');
     } else {
       topbar.classList.remove('hidden'); mainArea.classList.remove('no-nav');
-      if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
+      if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio'){ tabbar.classList.add('hidden'); } else { tabbar.classList.remove('hidden'); }
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       const btn = document.querySelector('.tab[data-tab="'+name+'"]');
       if(btn) btn.classList.add('active');
@@ -65,9 +65,12 @@
         if(name==='chat' && currentChatPartner) customTitle = currentChatPartner.name;
         if(name==='gruppochat' && currentGroupChat) customTitle = currentGroupChat.name;
         if(name==='altroprofilo' && currentOtherProfile) customTitle = currentOtherProfile.name;
-        if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso'){
+        const settingsIcon = `<div class="icon-btn" onclick="go('impostazioni')" aria-label="Impostazioni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg></div>`;
+        if(name==='chat' || name==='commenti' || name==='gruppochat' || name==='progresso' || name==='impostazioni' || name==='salvati' || name==='archivio'){
           const backBtn = `<button class="icon-btn" onclick="goBack()" aria-label="Indietro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>`;
           topbar.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${backBtn}<div class="screen-title">${customTitle}</div></div><div class="head-actions">${shareIcon}</div>`;
+        } else if(name==='profilo'){
+          topbar.innerHTML = `<div class="screen-title">${customTitle}</div><div class="head-actions">${settingsIcon}</div>`;
         } else {
           topbar.innerHTML = `<div class="screen-title">${customTitle}</div><div class="head-actions">${shareIcon}</div>`;
         }
@@ -80,7 +83,10 @@
     if(name==='ai') refreshProCards();
     if(name==='aipro') loadProScreen();
     if(name==='ricerca') loadPeopleYouMayKnow();
-    if(name==='profilo'){ loadProfileChecklist(); loadMyChallenges(); renderBlockedUsersList(); }
+    if(name==='profilo'){ loadProfileChecklist(); loadMyChallenges(); if(typeof loadActivityHeatmap === 'function') loadActivityHeatmap(); }
+    if(name==='impostazioni') renderBlockedUsersList();
+    if(name==='salvati' && typeof loadSavedPosts === 'function') loadSavedPosts();
+    if(name==='archivio' && typeof loadArchivedPosts === 'function') loadArchivedPosts();
     if(name==='progresso' && typeof loadProgressUpdates === 'function') loadProgressUpdates();
     mainArea.scrollTo(0,0);
   }
@@ -399,7 +405,7 @@
     const grid = document.getElementById("myPostsGrid");
     if(!grid || !currentUser) return;
     try {
-      const { data } = await supabaseClient.from("posts").select("*").eq("author_id", currentUser.id).order("created_at", { ascending: false }).limit(30);
+      const { data } = await supabaseClient.from("posts").select("*").eq("author_id", currentUser.id).eq("archived", false).order("created_at", { ascending: false }).limit(30);
       grid.innerHTML = "";
       if(!data || data.length === 0){
         grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Non hai ancora pubblicato allenamenti</div></div>';
@@ -432,6 +438,55 @@
         grid.appendChild(cell);
       });
     } catch(e){}
+  }
+
+  // ================= MAPPA ATTIVITÀ REALE ("Ultime 18 settimane") =================
+  // Calcola quante volte ti sei allenato in ciascuno degli ultimi 126 giorni
+  // (18 blocchi da 7 giorni) a partire dai post reali, invece di colori casuali.
+  const HEAT_SHADES = ['#1B1F19','#233318','#3B5A1E','#4E9A2A','#57E13B'];
+  function heatShadeFor(count){
+    if(!count) return HEAT_SHADES[0];
+    if(count === 1) return HEAT_SHADES[2];
+    if(count === 2) return HEAT_SHADES[3];
+    return HEAT_SHADES[4];
+  }
+  function renderEmptyHeatmap(heat){
+    heat.innerHTML = "";
+    for(let i=0;i<18*7;i++){
+      const cell = document.createElement("div"); cell.className = "heat-cell"; cell.style.background = HEAT_SHADES[0];
+      heat.appendChild(cell);
+    }
+  }
+  async function loadActivityHeatmap(){
+    const heat = document.getElementById("heatGrid");
+    if(!heat) return;
+    if(!supabaseClient || !currentUser){ renderEmptyHeatmap(heat); return; }
+    try {
+      const totalDays = 18 * 7;
+      const since = new Date(); since.setHours(0,0,0,0); since.setDate(since.getDate() - (totalDays - 1));
+      const { data } = await supabaseClient.from("posts").select("created_at").eq("author_id", currentUser.id).eq("archived", false).gte("created_at", since.toISOString());
+      const counts = {};
+      (data || []).forEach(function(p){
+        const d = new Date(p.created_at);
+        const key = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      heat.innerHTML = "";
+      // 7 righe (giorno all'interno del blocco settimanale) x 18 colonne (blocco, dal più vecchio al più recente)
+      for(let row=0; row<7; row++){
+        for(let week=0; week<18; week++){
+          const dayIndex = week * 7 + row;
+          const cellDate = new Date(since);
+          cellDate.setDate(since.getDate() + dayIndex);
+          const key = cellDate.getFullYear() + "-" + (cellDate.getMonth()+1) + "-" + cellDate.getDate();
+          const cell = document.createElement("div"); cell.className = "heat-cell"; cell.style.background = heatShadeFor(counts[key]);
+          cell.title = cellDate.toLocaleDateString("it-IT") + (counts[key] ? (": " + counts[key] + " allenamento/i") : "");
+          heat.appendChild(cell);
+        }
+      }
+    } catch(e){
+      renderEmptyHeatmap(heat);
+    }
   }
 
   async function saveProfileSettings(){
@@ -503,12 +558,23 @@
   let feedHasMore = true;
   let feedLoadingMore = false;
 
+  let mySavedPostIds = new Set();
+
   function applyMyReactionsToPosts(posts, cb){
     if(!currentUser){ cb(); return; }
-    supabaseClient.from("likes").select("post_id,reaction_type").eq("user_id", currentUser.id).then(function(res){
+    Promise.all([
+      supabaseClient.from("likes").select("post_id,reaction_type").eq("user_id", currentUser.id),
+      supabaseClient.from("saved_posts").select("post_id").eq("user_id", currentUser.id)
+    ]).then(function(results){
+      const likeRes = results[0], savedRes = results[1];
       const reactionByPost = {};
-      (res.data||[]).forEach(r => { reactionByPost[r.post_id] = r.reaction_type || "like"; });
-      posts.forEach(p => { p._likedByMe = Object.prototype.hasOwnProperty.call(reactionByPost, p.id); p._myReaction = reactionByPost[p.id] || null; });
+      (likeRes.data||[]).forEach(r => { reactionByPost[r.post_id] = r.reaction_type || "like"; });
+      mySavedPostIds = new Set((savedRes.data||[]).map(function(r){ return r.post_id; }));
+      posts.forEach(p => {
+        p._likedByMe = Object.prototype.hasOwnProperty.call(reactionByPost, p.id);
+        p._myReaction = reactionByPost[p.id] || null;
+        p._savedByMe = mySavedPostIds.has(p.id);
+      });
       cb();
     }).catch(cb);
   }
@@ -525,7 +591,7 @@
         authorIds = (followingRows || []).map(function(r){ return r.following_id; });
         authorIds.push(currentUser.id);
       }
-      let query = supabaseClient.from("posts").select("*").order("created_at", { ascending: false }).range(0, FEED_PAGE_SIZE - 1);
+      let query = supabaseClient.from("posts").select("*").eq("archived", false).order("created_at", { ascending: false }).range(0, FEED_PAGE_SIZE - 1);
       if(authorIds && authorIds.length){ query = query.in("author_id", authorIds); }
       const { data, error } = await query;
       if(error) throw error;
@@ -533,7 +599,7 @@
       if(authorIds && posts.length === 0){
         // Non segui ancora nessuno (o chi segui non ha post): mostriamo gli ultimi post pubblici per scoprire persone
         authorIds = null;
-        const { data: discover } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false }).range(0, FEED_PAGE_SIZE - 1);
+        const { data: discover } = await supabaseClient.from("posts").select("*").eq("archived", false).order("created_at", { ascending: false }).range(0, FEED_PAGE_SIZE - 1);
         posts = discover || [];
       }
       feedQueryAuthorIds = authorIds;
@@ -552,7 +618,7 @@
     if(!supabaseClient || !feedHasMore || feedLoadingMore) return;
     feedLoadingMore = true;
     try {
-      let query = supabaseClient.from("posts").select("*").order("created_at", { ascending: false }).range(feedOffset, feedOffset + FEED_PAGE_SIZE - 1);
+      let query = supabaseClient.from("posts").select("*").eq("archived", false).order("created_at", { ascending: false }).range(feedOffset, feedOffset + FEED_PAGE_SIZE - 1);
       if(feedQueryAuthorIds && feedQueryAuthorIds.length){ query = query.in("author_id", feedQueryAuthorIds); }
       const { data, error } = await query;
       if(error) throw error;
@@ -711,9 +777,9 @@
       shareBtn.appendChild(svgIcon("M22 2 11 13M22 2 15 22l-4-9-9-4 20-7z"));
       const spacer = document.createElement("div"); spacer.className = "spacer";
       const saveBtn = document.createElement("button");
-      saveBtn.className = "save-btn";
+      saveBtn.className = "save-btn" + (p._savedByMe ? " saved" : "");
       saveBtn.setAttribute("aria-label","Salva");
-      saveBtn.onclick = function(){ toggleSave(saveBtn); };
+      saveBtn.onclick = function(){ toggleSave(saveBtn, p.id); };
       saveBtn.appendChild(svgIcon("M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"));
       actions.appendChild(kudos); actions.appendChild(commentBtn); actions.appendChild(shareBtn);
       actions.appendChild(spacer); actions.appendChild(saveBtn);
@@ -851,7 +917,7 @@
       const day = now.getDay() === 0 ? 7 : now.getDay();
       const monday = new Date(now); monday.setDate(now.getDate() - day + 1); monday.setHours(0,0,0,0);
 
-      let query = supabaseClient.from("posts").select("author_id,author_name,distance_km,created_at").gte("created_at", monday.toISOString());
+      let query = supabaseClient.from("posts").select("author_id,author_name,distance_km,created_at").eq("archived", false).gte("created_at", monday.toISOString());
       if(typeof leaderboardScope !== "undefined" && leaderboardScope === "amici"){
         const { data: followingRows } = await supabaseClient.from("follows").select("following_id").eq("follower_id", currentUser.id);
         const friendIds = (followingRows || []).map(function(r){ return r.following_id; });
@@ -890,7 +956,7 @@
 
       // Km del mese per la card statistiche in alto
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const { data: monthData } = await supabaseClient.from("posts").select("distance_km").eq("author_id", currentUser.id).gte("created_at", monthStart.toISOString());
+      const { data: monthData } = await supabaseClient.from("posts").select("distance_km").eq("author_id", currentUser.id).eq("archived", false).gte("created_at", monthStart.toISOString());
       const monthKm = (monthData || []).reduce(function(sum, r){ return sum + (Number(r.distance_km) || 0); }, 0);
       const kmEl = document.getElementById("statKm");
       if(kmEl) kmEl.textContent = Math.round(monthKm);
@@ -1132,11 +1198,18 @@
     } catch(e){}
   }
 
+  function hideChatTypingIndicator(){
+    const el = document.getElementById("chatTypingIndicator");
+    if(el) el.style.display = "none";
+    if(partnerTypingTimeout){ clearTimeout(partnerTypingTimeout); partnerTypingTimeout = null; }
+  }
+
   function appendChatBubble(m, fromMe){
     const thread = document.getElementById("chatThread");
     if(!thread) return;
     const b = document.createElement("div");
     b.className = "msg-bubble " + (fromMe ? "me" : "them");
+    if(m.id) b.dataset.messageId = m.id;
     if(m.media_url){
       const img = document.createElement("img");
       img.src = m.media_url; img.className = "msg-image"; img.loading = "lazy"; img.alt = "";
@@ -1146,11 +1219,34 @@
       const txt = document.createElement("div"); txt.textContent = m.content;
       b.appendChild(txt);
     }
+    if(fromMe){
+      const status = document.createElement("div");
+      status.className = "msg-status" + (m.read ? " read" : "");
+      status.textContent = m.read ? "✓✓ Letto" : "✓ Inviato";
+      b.appendChild(status);
+    }
     thread.appendChild(b);
     thread.scrollTop = thread.scrollHeight;
+    if(!fromMe) hideChatTypingIndicator();
+  }
+
+  function markChatBubbleRead(messageId){
+    const thread = document.getElementById("chatThread");
+    if(!thread) return;
+    const bubble = thread.querySelector('[data-message-id="' + messageId + '"]');
+    if(!bubble) return;
+    const status = bubble.querySelector(".msg-status");
+    if(status){ status.textContent = "✓✓ Letto"; status.classList.add("read"); }
   }
 
   let chatRealtimeChannel = null;
+  let chatTypingChannel = null;
+  let chatTypingSendTimeout = null;
+  let partnerTypingTimeout = null;
+
+  function chatPairChannelName(idA, idB){
+    return "typing-" + [idA, idB].sort().join("-");
+  }
 
   function subscribeChatRealtime(otherId){
     unsubscribeChatRealtime();
@@ -1167,6 +1263,24 @@
             loadConversations();
           }
         })
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter: "sender_id=eq." + currentUser.id }, function(payload){
+          const m = payload.new;
+          if(m.read) markChatBubbleRead(m.id);
+        })
+        .subscribe();
+    } catch(e){}
+    try {
+      chatTypingChannel = supabaseClient.channel(chatPairChannelName(currentUser.id, otherId))
+        .on("broadcast", { event: "typing" }, function(payload){
+          if(payload && payload.payload && payload.payload.from === otherId){
+            const el = document.getElementById("chatTypingIndicator");
+            if(el){
+              el.style.display = "block";
+              if(partnerTypingTimeout) clearTimeout(partnerTypingTimeout);
+              partnerTypingTimeout = setTimeout(hideChatTypingIndicator, 3000);
+            }
+          }
+        })
         .subscribe();
     } catch(e){}
   }
@@ -1176,6 +1290,19 @@
       supabaseClient.removeChannel(chatRealtimeChannel);
     }
     chatRealtimeChannel = null;
+    if(chatTypingChannel && supabaseClient && supabaseClient.removeChannel){
+      supabaseClient.removeChannel(chatTypingChannel);
+    }
+    chatTypingChannel = null;
+    hideChatTypingIndicator();
+  }
+
+  // Chiamata da oninput sul campo di testo della chat: avvisa l'altra persona
+  // che stai scrivendo, al massimo una volta ogni 2 secondi (throttle).
+  function handleChatTyping(){
+    if(!chatTypingChannel || !currentUser || chatTypingSendTimeout) return;
+    chatTypingChannel.send({ type: "broadcast", event: "typing", payload: { from: currentUser.id } });
+    chatTypingSendTimeout = setTimeout(function(){ chatTypingSendTimeout = null; }, 2000);
   }
 
   async function openChat(otherId, otherName){
@@ -1594,8 +1721,25 @@
     document.querySelectorAll(".reaction-picker").forEach(function(p){ p.remove(); });
   }
 
-  function toggleSave(btn){
-    btn.classList.toggle("saved");
+  async function toggleSave(btn, postId){
+    if(!postId){ btn.classList.toggle("saved"); return; } // post di esempio, nessun salvataggio reale
+    if(!currentUser || !supabaseClient){ toast("Devi accedere per salvare"); return; }
+    const willSave = !btn.classList.contains("saved");
+    btn.classList.toggle("saved", willSave); // feedback immediato, prima della risposta del server
+    try {
+      if(willSave){
+        await supabaseClient.from("saved_posts").insert({ user_id: currentUser.id, post_id: postId });
+        mySavedPostIds.add(postId);
+      } else {
+        await supabaseClient.from("saved_posts").delete().match({ user_id: currentUser.id, post_id: postId });
+        mySavedPostIds.delete(postId);
+      }
+      const p = realPosts.find(function(x){ return x.id === postId; });
+      if(p) p._savedByMe = willSave;
+    } catch(e){
+      btn.classList.toggle("saved", !willSave); // ripristina se il salvataggio non è riuscito
+      toast("Operazione non riuscita, riprova");
+    }
   }
 
   // ================= RICERCA "CORRI CON ME" (demo, invariata) =================

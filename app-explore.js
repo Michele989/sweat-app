@@ -52,7 +52,7 @@ async function loadPopularPosts(){
   grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Caricamento...</div></div>';
   try {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { data } = await supabaseClient.from("posts").select("*").gte("created_at", since).order("likes_count", { ascending: false }).limit(30);
+    const { data } = await supabaseClient.from("posts").select("*").eq("archived", false).gte("created_at", since).order("likes_count", { ascending: false }).limit(30);
     renderExploreGrid(data || []);
   } catch(e){
     grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Impossibile caricare i post popolari</div></div>';
@@ -72,7 +72,7 @@ async function executeHashtagSearch(query){
   if(!clean){ loadPopularPosts(); return; }
   grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Ricerca...</div></div>';
   try {
-    const { data } = await supabaseClient.from("posts").select("*").contains("hashtags", [clean]).order("created_at", { ascending: false }).limit(30);
+    const { data } = await supabaseClient.from("posts").select("*").eq("archived", false).contains("hashtags", [clean]).order("created_at", { ascending: false }).limit(30);
     renderExploreGrid(data || []);
   } catch(e){
     grid.innerHTML = '<div class="live-row" style="grid-column:1/-1;"><div class="txt">Nessun risultato</div></div>';
